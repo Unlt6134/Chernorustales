@@ -36,6 +36,33 @@
     .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 14px; border-radius: 5px; cursor: pointer; transition: 0.2s; white-space: nowrap; font-size: 0.85rem; }
     .btn-outline:hover { border-color: var(--accent); color: #fff; }
     .section-title { font-size: 1.25rem; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .comic-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 30px; }
+    .comic-header { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 14px; gap: 8px; font-size: 0.92rem; }
+    .voice-credits { font-size: 0.8rem; color: var(--text-muted); background: #111412; padding: 4px 10px; border-radius: 4px; }
+    .comic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .panel { background: #111412; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+    .art-placeholder { height: 220px; background: radial-gradient(circle, #252b27 0%, #111412 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 14px; color: var(--text-muted); border-bottom: 1px solid var(--border); position: relative; font-size: 0.9rem; overflow: hidden; }
+    .art-placeholder.has-img { padding: 0; }
+    .art-placeholder img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .panel-num { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.75); padding: 2px 8px; font-size: 0.72rem; border-radius: 3px; color: #fff; z-index: 2; }
+    .dialogue-box { padding: 14px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .en-phrase { font-weight: bold; color: #fff; font-size: 0.98rem; }
+    .ru-trans { color: var(--gold); font-size: 0.82rem; margin: 4px 0; }
+    .ru-meaning { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px; }
+    .play-btn { background: var(--accent); color: #fff; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; transition: 0.15s; }
+    .play-btn:hover { background: var(--accent-hover); }
+    .phrasebook-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+    .phrase-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+    .tag { display: inline-block; font-size: 0.68rem; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; margin-bottom: 6px; font-weight: bold; }
+    .tag-peace { background: #23472e; color: #7ce09b; }
+    .tag-danger { background: #4f2020; color: #ff8a8a; }
+    .tag-trade { background: #473b1e; color: #fde047; }
+    .map-frame-wrap { width: 100%; height: calc(100vh - 115px); position: relative; }
+    .map-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+    .guide-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; margin-bottom: 24px; font-size: 0.88rem; }
+    .guide-table th, .guide-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+    .guide-table th { background: #141715; color: var(--gold); text-transform: uppercase; font-size: 0.76rem; letter-spacing: 0.5px; }
+    footer { text-align: center; padding: 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.82rem; margin-top: auto; }
   </style>
 </head>
 <body>
@@ -49,39 +76,11 @@
   <button class="tab-btn" onclick="openTab('phrases', this)">🎙 Разговорник</button>
   <button class="tab-btn" onclick="openTab('guide', this)">💊 Шпаргалка рейда</button>
 </nav>
-<style>
-  .comic-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 30px; }
-  .comic-header { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 14px; gap: 8px; font-size: 0.92rem; }
-  .voice-credits { font-size: 0.8rem; color: var(--text-muted); background: #111412; padding: 4px 10px; border-radius: 4px; }
-  .comic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
-  .panel { background: #111412; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
-  .art-placeholder { height: 185px; background: radial-gradient(circle, #252b27 0%, #111412 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 14px; color: var(--text-muted); border-bottom: 1px solid var(--border); position: relative; font-size: 0.9rem; }
-  .panel-num { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.75); padding: 2px 8px; font-size: 0.72rem; border-radius: 3px; color: #fff; }
-  .dialogue-box { padding: 14px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-  .en-phrase { font-weight: bold; color: #fff; font-size: 0.98rem; }
-  .ru-trans { color: var(--gold); font-size: 0.82rem; margin: 4px 0; }
-  .ru-meaning { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px; }
-  .play-btn { background: var(--accent); color: #fff; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; transition: 0.15s; }
-  .play-btn:hover { background: var(--accent-hover); }
-  .phrasebook-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
-  .phrase-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
-  .tag { display: inline-block; font-size: 0.68rem; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; margin-bottom: 6px; font-weight: bold; }
-  .tag-peace { background: #23472e; color: #7ce09b; }
-  .tag-danger { background: #4f2020; color: #ff8a8a; }
-  .tag-trade { background: #473b1e; color: #fde047; }
-  .map-frame-wrap { width: 100%; height: calc(100vh - 115px); position: relative; }
-  .map-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
-  .guide-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; margin-bottom: 24px; font-size: 0.88rem; }
-  .guide-table th, .guide-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
-  .guide-table th { background: #141715; color: var(--gold); text-transform: uppercase; font-size: 0.76rem; letter-spacing: 0.5px; }
-  footer { text-align: center; padding: 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.82rem; margin-top: auto; }
-</style>
-
 <div id="tab-comics" class="tab-content active">
   <div class="container">
     <div class="ad-banner">
       <div><small>Партнер выпуска • Сервер недели</small><strong>VANILLA+ SAKHAL [RU/EU]</strong> — Хардкорное выживание без лишних модов</div>
-      <a href="#map" onclick="openTab('map', document.querySelectorAll('.tab-btn').at(1)); return false;" class="ad-btn">Открыть карту →</a>
+      <a href="#map" onclick="openTab('map', document.querySelectorAll('.tab-btn')[1]); return false;" class="ad-btn">Открыть карту →</a>
     </div>
 
     <div class="fact-box">
@@ -92,7 +91,7 @@
       <button class="btn-outline" onclick="nextFact()">Следующий факт ↻</button>
     </div>
 
-        <div class="section-title"><span>Выпуск #01: Встреча у колонки в Березино</span></div>
+    <div class="section-title"><span>Выпуск #01: Встреча у колонки в Березино</span></div>
     <div class="comic-card">
       <div class="comic-header">
         <span><strong>Ситуация:</strong> У тебя только лопата, а навстречу выходит фулл-гир с М4.</span>
@@ -131,7 +130,8 @@
         </div>
       </div>
     </div>
-
+  </div>
+</div>
 <div id="tab-map" class="tab-content">
   <div class="map-frame-wrap">
     <iframe src="map.html" title="Тактическая карта Черноруси"></iframe>
@@ -152,6 +152,7 @@
     <div class="phrasebook-grid" id="phrase-list"></div>
   </div>
 </div>
+
 <div id="tab-guide" class="tab-content">
   <div class="container">
     <div class="section-title"><span>💊 Справочник болезней DayZ</span></div>
@@ -201,7 +202,7 @@ let factIdx = 0;
 function nextFact() {
   factIdx = (factIdx + 1) % facts.length;
   document.getElementById('fact-num').textContent = factIdx + 1;
-  document.getElementById('fact-text').textContent = facts.at(factIdx);
+  document.getElementById('fact-text').textContent = facts[factIdx];
 }
 
 function speakPhrase(text) {
