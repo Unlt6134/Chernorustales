@@ -1,0 +1,17 @@
+* { box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100dvh; background: #a8c6df; overflow: hidden; position: fixed; }
+#map { width: 100%; height: 100%; background: #a8c6df; z-index: 1; }
+.top-bar { position: fixed; top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; z-index: 1000; display: flex; gap: 6px; background: rgba(18, 22, 26, 0.92); padding: 6px; border-radius: 12px; border: 1px solid #2c353d; }
+.mode-btn { flex: 1; padding: 10px 4px; border: 1px solid #38424b; background: #1c2228; color: #e0e0e0; border-radius: 8px; font-size: 12px; font-weight: 600; text-align: center; }
+.mode-btn.active { background: #2e7d32; border-color: #4caf50; color: #fff; }
+.mode-btn.edit-active { background: #d84315; border-color: #ff7043; color: #fff; }
+.bottom-panel { position: fixed; bottom: max(10px, env(safe-area-inset-bottom)); left: 10px; right: 10px; z-index: 1000; background: rgba(18, 22, 26, 0.94); color: #fff; padding: 12px; border-radius: 14px; max-height: 36dvh; overflow-y: auto; border: 1px solid #2c353d; }
+.btn-row { display: flex; gap: 6px; margin-top: 8px; }
+.btn-action { flex: 1; padding: 10px 8px; background: #1976d2; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.btn-gray { background: #37474f; }
+.btn-copy { background: #ef6c00; }
+.route-card { padding: 8px 10px; margin-top: 6px; background: #232a31; border-radius: 8px; font-size: 13px; border-left: 4px solid #fff; display: flex; justify-content: space-between; }
+#editor-controls { display: none; }
+select { width: 100%; padding: 9px; background: #232a31; color: #fff; border: 1px solid #38424b; border-radius: 8px; font-size: 13px; }
+.city-tooltip { background: rgba(15, 18, 22, 0.85); border: 1px solid #555; color: #fff; font-size: 11px; padding: 1px 5px; border-radius: 4px; box-shadow: none; }
+.city-tooltip::before { display: none; }

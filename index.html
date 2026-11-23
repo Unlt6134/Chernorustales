@@ -1,0 +1,227 @@
+ <!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHERNARUS TALES — Портал выжившего DayZ</title>
+  <style>
+    :root {
+      --bg-dark: #0f1110;
+      --bg-card: #181c1a;
+      --accent: #a83232;
+      --accent-hover: #c93b3b;
+      --gold: #d4a359;
+      --text-main: #e2e6e3;
+      --text-muted: #8c9690;
+      --border: #2c332f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: linear-gradient(180deg, #1b211e 0%, var(--bg-dark) 100%); border-bottom: 1px solid var(--border); padding: 20px 16px 14px; text-align: center; }
+    header h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); letter-spacing: 3px; text-transform: uppercase; color: #fff; }
+    header h1 span { color: var(--accent); }
+    header p { color: var(--text-muted); margin-top: 4px; font-size: 0.9rem; }
+    .nav-tabs { display: flex; justify-content: center; gap: 6px; padding: 10px 12px; background: #121513; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; flex-wrap: wrap; }
+    .tab-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.15s; }
+    .tab-btn:hover { border-color: var(--accent); color: #fff; }
+    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .tab-content { display: none; flex: 1; }
+    .tab-content.active { display: block; }
+    .container { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+    .ad-banner { background: #141715; border: 1px dashed #3d4741; border-radius: 8px; padding: 12px 18px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .ad-banner small { color: var(--text-muted); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 1px; display: block; }
+    .ad-btn { background: var(--accent); color: #fff; text-decoration: none; padding: 6px 14px; border-radius: 4px; font-size: 0.82rem; font-weight: bold; }
+    .fact-box { background: var(--bg-card); border-left: 4px solid var(--accent); border-radius: 6px; padding: 16px 18px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .fact-title { font-size: 0.78rem; text-transform: uppercase; color: var(--accent); font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 14px; border-radius: 5px; cursor: pointer; transition: 0.2s; white-space: nowrap; font-size: 0.85rem; }
+    .btn-outline:hover { border-color: var(--accent); color: #fff; }
+    .section-title { font-size: 1.25rem; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>CHERNARUS <span>TALES</span></h1>
+  <p>Авторские комиксы по DayZ, тактический навигатор и шпаргалки выжившего</p>
+</header>
+<nav class="nav-tabs">
+  <button class="tab-btn active" onclick="openTab('comics', this)">📖 Комиксы и Факты</button>
+  <button class="tab-btn" onclick="openTab('map', this)">🧭 Навигатор</button>
+  <button class="tab-btn" onclick="openTab('phrases', this)">🎙 Разговорник</button>
+  <button class="tab-btn" onclick="openTab('guide', this)">💊 Шпаргалка рейда</button>
+</nav>
+<style>
+  .comic-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 30px; }
+  .comic-header { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 14px; gap: 8px; font-size: 0.92rem; }
+  .voice-credits { font-size: 0.8rem; color: var(--text-muted); background: #111412; padding: 4px 10px; border-radius: 4px; }
+  .comic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  .panel { background: #111412; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+  .art-placeholder { height: 185px; background: radial-gradient(circle, #252b27 0%, #111412 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 14px; color: var(--text-muted); border-bottom: 1px solid var(--border); position: relative; font-size: 0.9rem; }
+  .panel-num { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.75); padding: 2px 8px; font-size: 0.72rem; border-radius: 3px; color: #fff; }
+  .dialogue-box { padding: 14px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .en-phrase { font-weight: bold; color: #fff; font-size: 0.98rem; }
+  .ru-trans { color: var(--gold); font-size: 0.82rem; margin: 4px 0; }
+  .ru-meaning { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px; }
+  .play-btn { background: var(--accent); color: #fff; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; transition: 0.15s; }
+  .play-btn:hover { background: var(--accent-hover); }
+  .phrasebook-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+  .phrase-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .tag { display: inline-block; font-size: 0.68rem; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; margin-bottom: 6px; font-weight: bold; }
+  .tag-peace { background: #23472e; color: #7ce09b; }
+  .tag-danger { background: #4f2020; color: #ff8a8a; }
+  .tag-trade { background: #473b1e; color: #fde047; }
+  .map-frame-wrap { width: 100%; height: calc(100vh - 115px); position: relative; }
+  .map-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+  .guide-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; margin-bottom: 24px; font-size: 0.88rem; }
+  .guide-table th, .guide-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+  .guide-table th { background: #141715; color: var(--gold); text-transform: uppercase; font-size: 0.76rem; letter-spacing: 0.5px; }
+  footer { text-align: center; padding: 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.82rem; margin-top: auto; }
+</style>
+
+<div id="tab-comics" class="tab-content active">
+  <div class="container">
+    <div class="ad-banner">
+      <div><small>Партнер выпуска • Сервер недели</small><strong>VANILLA+ SAKHAL [RU/EU]</strong> — Хардкорное выживание без лишних модов</div>
+      <a href="#map" onclick="openTab('map', document.querySelectorAll('.tab-btn').at(1)); return false;" class="ad-btn">Открыть карту →</a>
+    </div>
+
+    <div class="fact-box">
+      <div style="flex:1; min-width:220px;">
+        <div class="fact-title">Совет выжившего #<span id="fact-num">1</span></div>
+        <div id="fact-text">Сырое мясо в куртке греет персонажа так же хорошо, как самодельная грелка, но следите за чистотой рук перед едой.</div>
+      </div>
+      <button class="btn-outline" onclick="nextFact()">Следующий факт ↻</button>
+    </div>
+
+    <div class="section-title"><span>Выпуск #01: Встреча у колонки в Березино</span></div>
+    <div class="comic-card">
+      <div class="comic-header">
+        <span><strong>Ситуация:</strong> У тебя только лопата, а навстречу выходит фулл-гир с М4.</span>
+        <span class="voice-credits">🎙 Озвучено в игре: @Survivor_UK & @Alex_RU</span>
+      </div>
+      <div class="comic-grid">
+        <div class="panel">
+          <div class="art-placeholder"><span class="panel-num">Кадр 1</span><span>[Место для рисунка #1]<br><small>Кепка с лопатой у колонки</small></span></div>
+          <div class="dialogue-box">
+            <div><div class="en-phrase">"Hey man, I'm friendly! Just getting water!"</div><div class="ru-trans">🗣 Хэй мэн, айм френдли! Джаст геттинг вотер!</div><div class="ru-meaning">Эй, друг, я мирный! Просто набираю воду!</div></div>
+            <button class="play-btn" onclick="speakPhrase('Hey man, I am friendly! Just getting water!')">▶ Прослушать</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="art-placeholder"><span class="panel-num">Кадр 2</span><span>[Место для рисунка #2]<br><small>Фулл-гир прицеливается из-за угла</small></span></div>
+          <div class="dialogue-box">
+            <div><div class="en-phrase">"Drop the shovel and put your hands up. Slowly."</div><div class="ru-trans">🗣 Дроп зе шавел энд пут ё хэндс ап. Слоули.</div><div class="ru-meaning">Бросай лопату и подними руки. Медленно.</div></div>
+            <button class="play-btn" onclick="speakPhrase('Drop the shovel and put your hands up. Slowly.')">▶ Прослушать</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="art-placeholder"><span class="panel-num">Кадр 3</span><span>[Место для рисунка #3]<br><small>Скидывает банку бобов в обмен на жизнь</small></span></div>
+          <div class="dialogue-box">
+            <div><div class="en-phrase">"I got no gun, bro. Take these beans and let me go."</div><div class="ru-trans">🗣 Ай гот ноу ган, бро. Тэйк зис бинс энд лет ми гоу.</div><div class="ru-meaning">У меня нет ствола, бро. Забирай бобы и отпусти меня.</div></div>
+            <button class="play-btn" onclick="speakPhrase('I got no gun, bro. Take these beans and let me go.')">▶ Прослушать</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="tab-map" class="tab-content">
+  <div class="map-frame-wrap">
+    <iframe src="map.html" title="Тактическая карта Черноруси"></iframe>
+  </div>
+</div>
+
+<div id="tab-phrases" class="tab-content">
+  <div class="container">
+    <div class="section-title">
+      <span>Разговорник для встреч и рейдов</span>
+      <div style="display:flex; gap:6px;">
+        <button class="btn-outline" onclick="filterPhrases('all')">Все</button>
+        <button class="btn-outline" onclick="filterPhrases('peace')">Мирные</button>
+        <button class="btn-outline" onclick="filterPhrases('trade')">Торговля</button>
+        <button class="btn-outline" onclick="filterPhrases('danger')">Бой</button>
+      </div>
+    </div>
+    <div class="phrasebook-grid" id="phrase-list"></div>
+  </div>
+</div>
+<div id="tab-guide" class="tab-content">
+  <div class="container">
+    <div class="section-title"><span>💊 Справочник болезней DayZ</span></div>
+    <table class="guide-table">
+      <thead><tr><th>Симптомы</th><th>Болезнь</th><th>Чем лечить</th></tr></thead>
+      <tbody>
+        <tr><td>Рвота после воды из лужи / фляги</td><td>Холера</td><td>Тетрациклин (пить/есть по 2 глотка)</td></tr>
+        <tr><td>Рвота после еды грязными руками / сырого мяса</td><td>Сальмонелла</td><td>Активированный уголь + витамины</td></tr>
+        <tr><td>Чихание, кашель, температура</td><td>Простуда / Грипп</td><td>Тетрациклин + мультивитамины + тепло</td></tr>
+        <tr><td>Кровь при кашле без порезов (после газа)</td><td>Отравление PO-X</td><td>Антидот PO-X или пакет чистой крови</td></tr>
+        <tr><td>Помутнение экрана после ранения грязным бинтом</td><td>Заражение крови</td><td>Дезинфекция спиртом/йодом (до 2 стадии) или Тетрациклин</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-title"><span>💥 Шпаргалка по рейду построек (1 секция стены)</span></div>
+    <table class="guide-table">
+      <thead><tr><th>Инструмент / Боеприпас</th><th>Деревянная стена</th><th>Металлическая стена</th></tr></thead>
+      <tbody>
+        <tr><td>Гранаты (М67 / РГД-5)</td><td>~12 штук</td><td>~12–13 штук</td></tr>
+        <tr><td>Пластид (C4)</td><td>2 заряда</td><td>2 заряда</td></tr>
+        <tr><td>Патроны 7.62×54 / .308 Win</td><td>~160–180 выстрелов</td><td>~220–250 выстрелов</td></tr>
+        <tr><td>Патроны 5.56×45 / 5.45×39</td><td>~260–290 выстрелов</td><td>~350–380 выстрелов</td></tr>
+        <tr><td>Топоры / Кувалды (ближний бой)</td><td>~6–8 топоров</td><td>~10–12 кувалд</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>CHERNARUS TALES • Выживай, общайся, прокладывай маршрут</footer>
+
+<script>
+function openTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+const facts = [
+  "Сырое мясо в куртке греет персонажа так же хорошо, как самодельная грелка, но следите за чистотой рук перед едой.",
+  "Колонки в деревнях всегда дают 100% чистую воду — пить из них можно прямо голыми руками без риска холеры.",
+  "Если замотать ноги тряпками (обмотки для ног), шаги станут почти бесшумными для других игроков в зданиях.",
+  "Красная зона артобстрела перед ударом подаёт сигнал: слышен свист снаряда за 5 секунд до падения газовой бомбы.",
+  "Пластиковую бутылку с изолентой можно превратить в самодельный глушитель — он выдержит 2–3 выстрела из винтовки."
+];
+let factIdx = 0;
+function nextFact() {
+  factIdx = (factIdx + 1) % facts.length;
+  document.getElementById('fact-num').textContent = factIdx + 1;
+  document.getElementById('fact-text').textContent = facts.at(factIdx);
+}
+
+function speakPhrase(text) {
+  if (!('speechSynthesis' in window)) { alert('Озвучка не поддерживается в этом браузере'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+
+const phrases = [
+  { cat: 'peace', tag: 'Мирный контакт', cls: 'tag-peace', en: "Friendly! Don't shoot, I'm a freshie!", tr: "Френдли! Донт шут, айм э фреши!", ru: "Мирный! Не стреляй, я кепка (только заспавнился)!" },
+  { cat: 'peace', tag: 'Мирный контакт', cls: 'tag-peace', en: "I'm passing through, no trouble.", tr: "Айм пассинг сру, ноу трабл.", ru: "Я просто прохожу мимо, без проблем." },
+  { cat: 'trade', tag: 'Торговля / Обмен', cls: 'tag-trade', en: "Do you have any spare food or tetracycline?", tr: "Ду ю хэв эни спэр фуд ор тетрасайклин?", ru: "Есть лишняя еда или тетрациклин?" },
+  { cat: 'trade', tag: 'Торговля / Обмен', cls: 'tag-trade', en: "I can trade ammo for a blood bag or bandage.", tr: "Ай кэн трэйд эммо фор э блад бэг ор бэндидж.", ru: "Могу обменять патроны на пакет крови или бинт." },
+  { cat: 'danger', tag: 'Угроза / Бой', cls: 'tag-danger', en: "Step back or I will open fire!", tr: "Стэп бэк ор ай вилл оупен файр!", ru: "Отойди назад или я открою огонь!" },
+  { cat: 'danger', tag: 'Угроза / Бой', cls: 'tag-danger', en: "Drop your weapon on the ground right now!", tr: "Дроп ё вепон он зе граунд райт нау!", ru: "Бросай оружие на землю прямо сейчас!" }
+];
+
+function renderPhrases(filter) {
+  const box = document.getElementById('phrase-list');
+  box.innerHTML = '';
+  phrases.filter(p => filter === 'all' || p.cat === filter).forEach(p => {
+    box.innerHTML += '<div class="phrase-item"><div><span class="tag ' + p.cls + '">' + p.tag + '</span><div class="en-phrase">"' + p.en + '"</div><div class="ru-trans">🗣 ' + p.tr + '</div><div class="ru-meaning">' + p.ru + '</div></div><button class="play-btn" onclick="speakPhrase(\'' + p.en.replace(/'/g, "\\'") + '\')">▶ Произнести</button></div>';
+  });
+}
+function filterPhrases(cat) { renderPhrases(cat); }
+renderPhrases('all');
+</script>
+</body>
+</html>
