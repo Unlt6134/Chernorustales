@@ -92,7 +92,7 @@
       <button class="btn-outline" onclick="nextFact()">Следующий факт ↻</button>
     </div>
 
-    <div class="section-title"><span>Выпуск #01: Встреча у колонки в Березино</span></div>
+        <div class="section-title"><span>Выпуск #01: Встреча у колонки в Березино</span></div>
     <div class="comic-card">
       <div class="comic-header">
         <span><strong>Ситуация:</strong> У тебя только лопата, а навстречу выходит фулл-гир с М4.</span>
@@ -100,21 +100,30 @@
       </div>
       <div class="comic-grid">
         <div class="panel">
-          <div class="art-placeholder"><span class="panel-num">Кадр 1</span><span>[Место для рисунка #1]<br><small>Кепка с лопатой у колонки</small></span></div>
+          <div class="art-placeholder has-img">
+            <span class="panel-num">Кадр 1</span>
+            <img src="comic1-1.webp" alt="Кепка с лопатой у колонки" onerror="this.parentElement.classList.remove('has-img'); this.outerHTML='<span>[Загрузите файл comic1-1.webp]<br><small>Кепка с лопатой у колонки</small></span>';">
+          </div>
           <div class="dialogue-box">
             <div><div class="en-phrase">"Hey man, I'm friendly! Just getting water!"</div><div class="ru-trans">🗣 Хэй мэн, айм френдли! Джаст геттинг вотер!</div><div class="ru-meaning">Эй, друг, я мирный! Просто набираю воду!</div></div>
             <button class="play-btn" onclick="speakPhrase('Hey man, I am friendly! Just getting water!')">▶ Прослушать</button>
           </div>
         </div>
         <div class="panel">
-          <div class="art-placeholder"><span class="panel-num">Кадр 2</span><span>[Место для рисунка #2]<br><small>Фулл-гир прицеливается из-за угла</small></span></div>
+          <div class="art-placeholder has-img">
+            <span class="panel-num">Кадр 2</span>
+            <img src="comic1-2.webp" alt="Фулл-гир прицеливается из-за угла" onerror="this.parentElement.classList.remove('has-img'); this.outerHTML='<span>[Загрузите файл comic1-2.webp]<br><small>Фулл-гир прицеливается из-за угла</small></span>';">
+          </div>
           <div class="dialogue-box">
             <div><div class="en-phrase">"Drop the shovel and put your hands up. Slowly."</div><div class="ru-trans">🗣 Дроп зе шавел энд пут ё хэндс ап. Слоули.</div><div class="ru-meaning">Бросай лопату и подними руки. Медленно.</div></div>
             <button class="play-btn" onclick="speakPhrase('Drop the shovel and put your hands up. Slowly.')">▶ Прослушать</button>
           </div>
         </div>
         <div class="panel">
-          <div class="art-placeholder"><span class="panel-num">Кадр 3</span><span>[Место для рисунка #3]<br><small>Скидывает банку бобов в обмен на жизнь</small></span></div>
+          <div class="art-placeholder has-img">
+            <span class="panel-num">Кадр 3</span>
+            <img src="comic1-3.webp" alt="Скидывает банку бобов в обмен на жизнь" onerror="this.parentElement.classList.remove('has-img'); this.outerHTML='<span>[Загрузите файл comic1-3.webp]<br><small>Скидывает банку бобов в обмен на жизнь</small></span>';">
+          </div>
           <div class="dialogue-box">
             <div><div class="en-phrase">"I got no gun, bro. Take these beans and let me go."</div><div class="ru-trans">🗣 Ай гот ноу ган, бро. Тэйк зис бинс энд лет ми гоу.</div><div class="ru-meaning">У меня нет ствола, бро. Забирай бобы и отпусти меня.</div></div>
             <button class="play-btn" onclick="speakPhrase('I got no gun, bro. Take these beans and let me go.')">▶ Прослушать</button>
@@ -122,8 +131,7 @@
         </div>
       </div>
     </div>
-  </div>
-</div>
+
 <div id="tab-map" class="tab-content">
   <div class="map-frame-wrap">
     <iframe src="map.html" title="Тактическая карта Черноруси"></iframe>
