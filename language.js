@@ -98,10 +98,16 @@ const KEY='ct_language', words={
 const ruToEn=Object.entries(words).sort((a,b)=>b[0].length-a[0].length);
 const enToRu=Object.entries(words).map(([a,b])=>[b,a]).sort((a,b)=>b[0].length-a[0].length);
 function translateText(text,lang){let out=text;for(const [from,to] of (lang==='en'?ruToEn:enToRu)){out=out.split(from).join(to)}return out}
+const originals=new WeakMap();
+function translateNode(node,lang){if(!originals.has(node))originals.set(node,node.nodeValue);node.nodeValue=translateText(originals.get(node),lang)}
+function translateTree(root,lang){
+ const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;
+ while(node=walker.nextNode())translateNode(node,lang);
+ if(root.nodeType===Node.TEXT_NODE)translateNode(root,lang);
+}
 function apply(lang){
 lang=lang==='en'?'en':'ru';document.documentElement.lang=lang;
-const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-let node;while(node=walker.nextNode()){if(!node.__ctOriginal)Object.defineProperty(node,'__ctOriginal',{value:node.nodeValue,writable:true,configurable:true});node.nodeValue=translateText(node.__ctOriginal,lang)}
+translateTree(document.body,lang);
 document.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el=>['placeholder','title','aria-label'].forEach(attr=>{const v=el.getAttribute(attr);if(v)el.setAttribute(attr,translateText(v,lang))}));
 let b=document.getElementById('ct-lang-toggle');if(b)b.textContent=lang==='en'?'RU':'EN';
 localStorage.setItem(KEY,lang);
@@ -112,8 +118,8 @@ const b=document.createElement('button');b.id='ct-lang-toggle';b.type='button';b
 b.addEventListener('click',()=>apply((localStorage.getItem(KEY)||'ru')==='ru'?'en':'ru'));
 apply(localStorage.getItem(KEY)||'ru');
 window.addEventListener('storage',e=>{if(e.key===KEY)apply(e.newValue||'ru')});
-const observer=new MutationObserver(records=>{const lang=localStorage.getItem(KEY)||'ru';for(const rec of records){if(rec.type==='childList'){rec.addedNodes.forEach(n=>{if(n.nodeType===Node.TEXT_NODE){n.__ctOriginal=n.nodeValue;n.nodeValue=translateText(n.nodeValue,lang)}else if(n.nodeType===Node.ELEMENT_NODE){const w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT);let t;while(t=w.nextNode()){t.__ctOriginal=t.nodeValue;t.nodeValue=translateText(t.nodeValue,lang)}}})}else if(rec.type==='characterData'){const n=rec.target;if(n.__ctLast!==n.nodeValue)n.__ctOriginal=n.nodeValue;n.nodeValue=translateText(n.__ctOriginal||n.nodeValue,lang);n.__ctLast=n.nodeValue}}});
-observer.observe(document.body,{subtree:true,childList:true,characterData:true});
+const observer=new MutationObserver(records=>{const lang=localStorage.getItem(KEY)||'ru';for(const rec of records){rec.addedNodes.forEach(n=>{if(n.nodeType===Node.TEXT_NODE)translateNode(n,lang);else if(n.nodeType===Node.ELEMENT_NODE)translateTree(n,lang)})}});
+observer.observe(document.body,{subtree:true,childList:true});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
