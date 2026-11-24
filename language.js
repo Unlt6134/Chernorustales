@@ -4,7 +4,7 @@ const KEY='ct_language', words={
 'Архив Черноруси':'Chernarus Archive','Добро пожаловать в информационную сеть выживших.':'Welcome to the survivors’ information network.',
 'Здесь собраны материалы, заметки, истории и сведения,':'This archive contains materials, notes, stories and information',
 'которые могут помочь тебе пережить ещё один день.':'that may help you survive another day.',
-'История Черноруси':'History of Chernarus','Выживание':'Survival','Опасные места':'Dangerous Locations','Секретные материалы':'Classified Files',
+'История Черноруси':'History of Chernarus','Выживание':'Survival','Опасные места':'Dangerous Locations','Секретные материалы':'Classified Files','Открыть досье →':'Open dossier →','← НАЗАД К РАЗДЕЛАМ':'← BACK TO SECTIONS',
 'Архив событий, загадки заражения и информация':'An archive of events, the infection mystery and information',
 'о мире после начала катастрофы.':'about the world after the outbreak.',
 'Полезные сведения о поиске припасов,':'Useful information about finding supplies,',
