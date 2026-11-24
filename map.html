@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#171b18">
+  <title>DayZ Chernarus — личная карта</title>
+
+  <!-- Leaflet: интерактивная карта -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>
+    :root {
+      --bg:#171b18; --panel:#202722; --panel2:#29332c; --line:#3b493e;
+      --text:#e8eee8; --muted:#aab7ab; --accent:#b6a16a; --red:#b84d43;
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:Arial,sans-serif; }
+    .app { height:100dvh; display:flex; flex-direction:column; }
+    header {
+      min-height:58px; display:flex; align-items:center; gap:12px; padding:9px 14px;
+      background:linear-gradient(90deg,#202720,#151a16); border-bottom:1px solid var(--line);
+      z-index:1000;
+    }
+    .brand { font-weight:800; letter-spacing:1.5px; white-space:nowrap; }
+    .brand span { color:var(--accent); }
+    .hint { color:var(--muted); font-size:12px; margin-left:auto; }
+    .main { flex:1; min-height:0; display:flex; }
+    aside {
+      width:286px; flex:0 0 286px; overflow:auto; padding:13px;
+      background:var(--panel); border-right:1px solid var(--line); z-index:500;
+    }
+    #map { flex:1; min-width:0; height:100%; background:#30372f; cursor:grab; }
+    #map:active { cursor:grabbing; }
+    h3 { margin:4px 0 10px; font-size:13px; letter-spacing:1px; color:var(--accent); text-transform:uppercase; }
+    .group { border-bottom:1px solid var(--line); padding-bottom:13px; margin-bottom:13px; }
+    .btns { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    button, select, input {
+      min-height:38px; border:1px solid var(--line); border-radius:7px; color:var(--text);
+      background:var(--panel2); padding:8px 10px; font:inherit;
+    }
+    button { cursor:pointer; font-size:13px; }
+    button:hover { border-color:var(--accent); }
+    button.active { background:#574c2e; border-color:var(--accent); }
+    button.danger { border-color:#79433e; }
+    .wide { width:100%; margin-top:7px; }
+    .field { width:100%; margin:5px 0; }
+    .small { color:var(--muted); font-size:11px; line-height:1.45; }
+    .legend { display:flex; align-items:center; gap:8px; margin:8px 0; font-size:13px; }
+    .dot { width:12px; height:12px; border-radius:50%; display:inline-block; border:2px solid #fff8; }
+    .status { font-size:12px; color:var(--muted); margin-top:8px; }
+    .leaflet-popup-content-wrapper,.leaflet-popup-tip { background:#202722; color:var(--text); }
+    .leaflet-popup-content { margin:11px 13px; }
+    .popup-title { font-weight:bold; margin-bottom:5px; }
+    .popup-delete { margin-top:8px; background:#63352f; border:0; padding:6px 9px; border-radius:5px; color:white; }
+    .custom-pin {
+      width:26px; height:26px; border:2px solid #fff; border-radius:50% 50% 50% 0;
+      transform:rotate(-45deg); box-shadow:0 1px 5px #000b;
+    }
+    .custom-pin i { display:block; width:8px; height:8px; border-radius:50%; background:#fff; margin:7px; }
+    .mobile-toggle { display:none; }
+    @media(max-width:760px) {
+      header { min-height:50px; padding:7px 10px; }
+      .hint { display:none; }
+      .main { position:relative; }
+      aside {
+        position:absolute; top:0; bottom:0; left:0; width:min(84vw,300px);
+        transform:translateX(-102%); transition:transform .2s ease; box-shadow:4px 0 18px #0008;
+      }
+      aside.open { transform:translateX(0); }
+      #map { width:100%; }
+      .mobile-toggle { display:inline-block; min-height:34px; padding:6px 10px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <button class="mobile-toggle" id="menuBtn" aria-label="Меню">☰</button>
+    <div class="brand">DAYZ <span>CHERNARUS+</span></div>
+    <div class="hint">Личные метки сохраняются только в этом браузере</div>
+  </header>
+
+  <div class="main">
+    <aside id="sidebar">
+      <section class="group">
+        <h3>Мои отметки</h3>
+        <div class="btns">
+          <button id="pinMode">📍 Маркер</button>
+          <button id="lootMode">🎒 Лут</button>
+          <button id="safeMode">🟢 Safe Zone</button>
+          <button id="pvpMode">🔴 PvP-зона</button>
+        </div>
+        <button class="wide" id="cancelMode">Отменить режим добавления</button>
+        <div class="status" id="modeStatus">Выбери тип отметки, затем нажми на карту.</div>
+      </section>
+
+      <section class="group">
+        <h3>Фильтры</h3>
+        <label class="legend"><input type="checkbox" id="showPins" checked> 📍 Мои маркеры</label>
+        <label class="legend"><input type="checkbox" id="showLoot" checked> 🎒 Лут</label>
+        <label class="legend"><input type="checkbox" id="showSafe" checked> 🟢 Safe Zone</label>
+        <label class="legend"><input type="checkbox" id="showPvp" checked> 🔴 PvP-зоны</label>
+      </section>
+
+      <section class="group">
+        <h3>Добавить отметку</h3>
+        <input class="field" id="markerName" placeholder="Название отметки">
+        <select class="field" id="lootType">
+          <option value="Военный лут">Военный лут</option>
+          <option value="Медицинский лут">Медицинский лут</option>
+          <option value="Промышленный лут">Промышленный лут</option>
+          <option value="Охотничий лут">Охотничий лут</option>
+          <option value="Транспорт">Транспорт</option>
+          <option value="Тайник">Тайник</option>
+        </select>
+        <label class="small" for="zoneRadius">Радиус зоны (метры условно)</label>
+        <input class="field" id="zoneRadius" type="number" min="50" max="5000" step="50" value="300">
+        <div class="small">Для личных заметок. Название можно оставить пустым — будет использовано стандартное.</div>
+      </section>
+
+      <section class="group">
+        <h3>Управление</h3>
+        <button class="wide" id="exportBtn">Экспорт моих отметок (JSON)</button>
+        <button class="wide" id="importBtn">Импорт отметок (JSON)</button>
+        <input id="importFile" type="file" accept=".json,application/json" hidden>
+        <button class="wide danger" id="clearBtn">Удалить все мои отметки</button>
+        <div class="status" id="countStatus"></div>
+      </section>
+
+      <p class="small">
+        Карта: публичный набор тайлов DayZ Chernarus. Отметки хранятся в localStorage этого браузера.
+        Экспортируй JSON, если хочешь перенести их на другое устройство.
+      </p>
+    </aside>
+
+    <div id="map" role="application" aria-label="Интерактивная карта Chernarus"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(() => {
+  const TILE_BASE = "https://raw.githubusercontent.com/ScullyXlife/dayz-map-tiles-public/main/maps/chernarus/layers/";
+  const TILE_SIZE = 512, TILE_COUNT = 30, WORLD = TILE_SIZE * TILE_COUNT;
+  const STORAGE_KEY = "dayz_chernarus_personal_marks_v1";
+
+  const map = L.map("map", {
+    crs: L.CRS.Simple,
+    minZoom: -3,
+    maxZoom: 3,
+    zoomSnap: 0.25,
+    zoomDelta: 0.5,
+    maxBounds: [[0, 0], [WORLD, WORLD]],
+    maxBoundsViscosity: 0.85,
+    attributionControl: true
+  });
+
+  // 30x30 исходных тайлов. При отдалении объединяем несколько исходных
+  // изображений в один экранный тайл; при приближении обрезаем нужную часть.
+  const ChernarusLayer = L.GridLayer.extend({
+    createTile(coords, done) {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = TILE_SIZE;
+      const ctx = canvas.getContext("2d");
+
+      const loadTile = (x, y, onload) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => onload(img, true);
+        img.onerror = () => onload(null, false);
+        img.src = TILE_BASE + `S_${String(x).padStart(3,"0")}_${String(y).padStart(3,"0")}_lco.png`;
+      };
+
+      if (coords.z < 0) {
+        const factor = Math.pow(2, -coords.z);
+        const gridSize = Math.ceil(TILE_COUNT / factor);
+        const startX = coords.x * factor;
+        const startY = (coords.y + gridSize) * factor;
+        const drawSize = TILE_SIZE / factor;
+        const jobs = [];
+        for (let dy = 0; dy < factor; dy++) {
+          for (let dx = 0; dx < factor; dx++) {
+            const sx = startX + dx, sy = startY + dy;
+            if (sx < TILE_COUNT && sy < TILE_COUNT) jobs.push({sx, sy, dx, dy});
+          }
+        }
+        if (!jobs.length) { done(null, canvas); return canvas; }
+        let remaining = jobs.length;
+        jobs.forEach(job => loadTile(job.sx, job.sy, (img, ok) => {
+          if (ok) ctx.drawImage(img, job.dx * drawSize, job.dy * drawSize, drawSize, drawSize);
+          remaining--;
+          if (!remaining) done(null, canvas);
+        }));
+      } else {
+        const scale = Math.pow(2, coords.z);
+        const sourceX = Math.floor(coords.x / scale);
+        const rowFromTop = coords.y + TILE_COUNT * scale;
+        const sourceY = Math.floor(rowFromTop / scale);
+        const subX = ((coords.x % scale) + scale) % scale;
+        const subY = ((rowFromTop % scale) + scale) % scale;
+        if (sourceX < 0 || sourceX >= TILE_COUNT || sourceY < 0 || sourceY >= TILE_COUNT) {
+          done(null, canvas); return canvas;
+        }
+        loadTile(sourceX, sourceY, (img, ok) => {
+          if (ok) {
+            const part = TILE_SIZE / scale;
+            ctx.drawImage(img, subX * part, subY * part, part, part, 0, 0, TILE_SIZE, TILE_SIZE);
+          }
+          done(null, canvas);
+        });
+      }
+      return canvas;
+    }
+  });
+  new ChernarusLayer({ tileSize: TILE_SIZE, noWrap: true, bounds: [[0,0],[WORLD,WORLD]] })
+    .addTo(map);
+
+  map.setView([WORLD / 2, WORLD / 2], -2);
+
+  const layers = {
+    pin: L.layerGroup().addTo(map),
+    loot: L.layerGroup().addTo(map),
+    safe: L.layerGroup().addTo(map),
+    pvp: L.layerGroup().addTo(map)
+  };
+
+  let marks = loadMarks();
+  let mode = null;
+
+  function loadMarks() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      return Array.isArray(raw) ? raw : [];
+    } catch { return []; }
+  }
+  function saveMarks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(marks));
+    render();
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+  function colorFor(type) {
+    return ({pin:"#d0b36b",loot:"#d7a34a",safe:"#49a86a",pvp:"#c84d43"})[type] || "#d0b36b";
+  }
+  function iconFor(type) {
+    const color = colorFor(type);
+    return L.divIcon({
+      className:"",
+      html:`<div class="custom-pin" style="background:${color}"><i></i></div>`,
+      iconSize:[26,26], iconAnchor:[13,25], popupAnchor:[0,-22]
+    });
+  }
+  function popupFor(m) {
+    const title = esc(m.name || "Без названия");
+    const detail = m.type === "loot" ? `<div>${esc(m.lootType || "Лут")}</div>` : "";
+    return `<div class="popup-title">${title}</div>${detail}
+      <div class="small">X: ${Math.round(m.lng)} · Z: ${Math.round(m.lat)}</div>
+      <button class="popup-delete" onclick="window.deletePersonalMark('${m.id}')">Удалить отметку</button>`;
+  }
+  window.deletePersonalMark = id => {
+    marks = marks.filter(m => m.id !== id);
+    saveMarks();
+  };
+
+  function render() {
+    Object.values(layers).forEach(layer => layer.clearLayers());
+    marks.forEach(m => {
+      const latlng = [m.lat, m.lng];
+      if (m.type === "safe" || m.type === "pvp") {
+        const circle = L.circle(latlng, {
+          radius: Number(m.radius || 300),
+          color: colorFor(m.type), fillColor: colorFor(m.type),
+          fillOpacity: 0.18, weight: 2
+        }).bindPopup(popupFor(m));
+        circle.addTo(layers[m.type]);
+      } else {
+        L.marker(latlng, { icon: iconFor(m.type) })
+          .bindPopup(popupFor(m)).addTo(layers[m.type]);
+      }
+    });
+    setVisibility();
+    document.getElementById("countStatus").textContent = `Сохранено отметок: ${marks.length}`;
+  }
+  function setVisibility() {
+    const checks = {pin:"showPins",loot:"showLoot",safe:"showSafe",pvp:"showPvp"};
+    Object.entries(checks).forEach(([key,id]) => {
+      const box = document.getElementById(id);
+      if (box.checked && !map.hasLayer(layers[key])) map.addLayer(layers[key]);
+      if (!box.checked && map.hasLayer(layers[key])) map.removeLayer(layers[key]);
+    });
+  }
+
+  function setMode(next) {
+    mode = next;
+    document.querySelectorAll("#pinMode,#lootMode,#safeMode,#pvpMode").forEach(b => b.classList.remove("active"));
+    const ids = {pin:"pinMode",loot:"lootMode",safe:"safeMode",pvp:"pvpMode"};
+    if (next) document.getElementById(ids[next]).classList.add("active");
+    document.getElementById("modeStatus").textContent = next
+      ? "Режим включён: нажми на нужное место карты."
+      : "Выбери тип отметки, затем нажми на карту.";
+  }
+  document.getElementById("pinMode").onclick = () => setMode("pin");
+  document.getElementById("lootMode").onclick = () => setMode("loot");
+  document.getElementById("safeMode").onclick = () => setMode("safe");
+  document.getElementById("pvpMode").onclick = () => setMode("pvp");
+  document.getElementById("cancelMode").onclick = () => setMode(null);
+
+  map.on("click", e => {
+    if (!mode) return;
+    const nameInput = document.getElementById("markerName");
+    const lootType = document.getElementById("lootType").value;
+    const defaults = {pin:"Моя отметка",loot:lootType,safe:"Safe Zone",pvp:"PvP-зона"};
+    marks.push({
+      id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()),
+      type: mode, name: nameInput.value.trim() || defaults[mode],
+      lootType: mode === "loot" ? lootType : "",
+      lat: e.latlng.lat, lng: e.latlng.lng,
+      radius: Number(document.getElementById("zoneRadius").value) || 300
+    });
+    nameInput.value = "";
+    saveMarks();
+    setMode(null);
+  });
+
+  ["showPins","showLoot","showSafe","showPvp"].forEach(id =>
+    document.getElementById(id).addEventListener("change", setVisibility)
+  );
+
+  document.getElementById("exportBtn").onclick = () => {
+    const blob = new Blob([JSON.stringify(marks,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "my-chernarus-markers.json"; a.click();
+    URL.revokeObjectURL(url);
+  };
+  document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
+  document.getElementById("importFile").onchange = async e => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      if (!Array.isArray(data)) throw new Error("Файл должен содержать массив отметок");
+      const valid = data.filter(m => m && ["pin","loot","safe","pvp"].includes(m.type)
+        && Number.isFinite(Number(m.lat)) && Number.isFinite(Number(m.lng)));
+      marks = [...marks, ...valid.map(m => ({...m, id:String(m.id || Date.now()+Math.random())}))];
+      saveMarks();
+      alert(`Импортировано отметок: ${valid.length}`);
+    } catch(err) { alert("Не удалось импортировать файл: " + err.message); }
+    e.target.value = "";
+  };
+  document.getElementById("clearBtn").onclick = () => {
+    if (confirm("Удалить все личные отметки из этого браузера?")) {
+      marks = []; saveMarks();
+    }
+  };
+
+  document.getElementById("menuBtn").onclick = () =>
+    document.getElementById("sidebar").classList.toggle("open");
+  render();
+})();
+</script>
+</body>
+</html>
