@@ -295,6 +295,16 @@ const KEY='ct_language', words={
 'Светошумовая граната (8-M4)':'Flashbang (8-M4)',
 'Единый раздел рейда':'Unified Raid Section',
 'Калькулятор урона, справочник прочности и подготовка к выходу.':'Damage calculator, durability reference and raid preparation.'
+,'Разговорник выжившего':'Survivor phrasebook',
+'Фразы для общения с другими выжившими. Выбирай категорию и используй готовые выражения.':'Useful lines for talking to other survivors. Pick a category and use a ready-made phrase.',
+'Все фразы':'All phrases',
+'Агрессия':'Aggression',
+'Вопросы':'Questions',
+'Мирный контакт':'Friendly contact',
+'Обмен и помощь':'Trade & help',
+'Место и направление':'Places & directions',
+'Командная связь':'Team communication',
+'Опасность':'Danger'
 };
 const ruToEn=Object.entries(words).sort((a,b)=>b[0].length-a[0].length);
 const enToRu=Object.entries(words).map(([a,b])=>[b,a]).sort((a,b)=>b[0].length-a[0].length);
