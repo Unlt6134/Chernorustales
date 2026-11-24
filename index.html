@@ -315,7 +315,7 @@ h1 {
 
 nav {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 9px;
   margin: 25px 0 32px;
 }
@@ -854,12 +854,8 @@ footer span {
           ▤ РАЗГОВОРНИК
         </button>
 
-        <button class="nav-button" onclick="openTab('raid', this)">
-          ◈ ШПАРГАЛКА РЕЙДА
-        </button>
-
         <button class="nav-button" onclick="openTab('raidcalc', this)">
-          ⚒ КАЛЬКУЛЯТОР РЕЙДА
+          ⚒ РЕЙД
         </button>
       </nav>
 
@@ -1045,90 +1041,32 @@ footer span {
 
         <!-- ШПАРГАЛКА -->
 
-        <section id="raid" class="tab-content">
-
-          <h2 class="section-heading">Шпаргалка рейда</h2>
-
-          <p class="section-description">
-            Краткий список вещей, которые стоит проверить
-            перед выходом на опасную территорию.
-          </p>
-
-          <div class="terminal-box">
-            <strong>[01] СНАРЯЖЕНИЕ</strong>
-            <br>
-            □ Оружие и боеприпасы
-            <br>
-            □ Запасной магазин
-            <br>
-            □ Нож или инструмент
-            <br>
-            □ Средства защиты
-            <br><br>
-
-            <strong>[02] МЕДИЦИНА</strong>
-            <br>
-            □ Бинты или тряпки
-            <br>
-            □ Таблетки
-            <br>
-            □ Антисептик
-            <br>
-            □ Запас крови или аптечка
-            <br><br>
-
-            <strong>[03] ВЫЖИВАНИЕ</strong>
-            <br>
-            □ Вода
-            <br>
-            □ Еда
-            <br>
-            □ Тёплая одежда
-            <br>
-            □ Фонарь и батарейки
-            <br><br>
-
-            <strong>[04] ПЕРЕД ВЫХОДОМ</strong>
-            <br>
-            □ Проверить маршрут
-            <br>
-            □ Проверить состояние экипировки
-            <br>
-            □ Убедиться, что есть свободное место
-            <br>
-            □ Оценить риски
-            <br><br>
-
-            <span class="terminal-line">> CHECK COMPLETE. READY FOR DEPLOYMENT.</span>
-          </div>
-
-        </section>
+        
 
         <section id="raidcalc" class="tab-content">
 
-          <h2 class="section-heading">Калькулятор рейда</h2>
+          <h2 class="section-heading">Единый раздел рейда</h2>
 
           <p class="section-description">
-            Расчёт по настраиваемым значениям HP и урона.
-            Встроенные цифры не выдаются за официальные данные игры.
+            Калькулятор урона, справочник прочности и подготовка к выходу.
           </p>
 
           <div class="map-shell">
             <div class="map-topbar">
-              <span>RAID CALCULATOR // CHERNARUS</span>
-              <span><span class="system-led"></span> ENGINEERING SYSTEM ACTIVE</span>
+              <span>RAID OPERATIONS // CHERNARUS</span>
+              <span><span class="system-led"></span> RAID SYSTEM ACTIVE</span>
             </div>
 
             <div class="map-frame">
               <iframe
                 src="raid.html"
-                title="Калькулятор рейда DayZ"
+                title="Единый раздел рейда DayZ"
                 loading="lazy">
               </iframe>
             </div>
 
             <div class="map-bottom">
-              CONFIGURABLE DAMAGE MODEL // LOCAL PROFILE
+              VANILLA DAMAGE REFERENCE // PRE-RAID CHECKLIST
             </div>
           </div>
 
