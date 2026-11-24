@@ -400,45 +400,6 @@
       letter-spacing: 1px;
     }
 
-    /* Leaflet в общей цветовой теме */
-    .leaflet-container {
-      font-family: "Courier New", monospace;
-    }
-
-    .leaflet-control-zoom a {
-      color: var(--green-bright) !important;
-      background: #101d14 !important;
-      border-color: #35533a !important;
-    }
-
-    .leaflet-control-zoom a:hover {
-      background: #25452c !important;
-    }
-
-    .leaflet-control-attribution {
-      color: #a5b9a8 !important;
-      background: #0b160ed9 !important;
-      font-size: 9px !important;
-    }
-
-    .leaflet-control-attribution a {
-      color: var(--green) !important;
-    }
-
-    .leaflet-popup-content-wrapper,
-    .leaflet-popup-tip {
-      background: #101d14;
-      color: var(--text);
-      border: 1px solid #426348;
-      box-shadow: 0 0 15px #000b;
-    }
-
-    .leaflet-popup-content {
-      margin: 12px 14px;
-      font-family: "Courier New", monospace;
-      font-size: 11px;
-    }
-
     .popup-title {
       color: var(--green-bright);
       font-weight: bold;
@@ -787,6 +748,7 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
       const task=(async()=>{
         let img=await loadImage(TILE_BASE+"S_"+String(x).padStart(3,"0")+"_"+String(y).padStart(3,"0")+"_lco.png");
         if(!img)img=await loadImage(TILE_FALLBACK+"S_"+String(x).padStart(3,"0")+"_"+String(y).padStart(3,"0")+"_lco.png");
+        cache.set(key,img||null);
         pending--;if(img)successful++;else failed++;updateStatus();requestRender();return img;
       })();
       cache.set(key,task);
