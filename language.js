@@ -144,7 +144,7 @@ const KEY='ct_language', words={
 ' единиц выбранного средства. При ':' units of the selected tool. With ',
 ' единицах в наличии расчётный урон составит ':' units available, estimated damage is ',
 ' на одну часть (до учёта распределения взрыва и дистанции).':' per part (before blast falloff and splash distribution).'
-,'ТОЧНОСТЬ ДАННЫХ.':'DATA ACCURACY.',
+'ТОЧНОСТЬ ДАННЫХ.':'DATA ACCURACY.',
 'Встроенная база рассчитана по игровым конфигам DayZ 1.30.164078.38 (источник ZIPANG).':'The built-in database is based on DayZ 1.30.164078.38 game configs (ZIPANG source).',
 'Взрывчатка предполагается установленной вплотную и наносящей полный урон; пули — на близкой дистанции.':'Explosives are assumed to be placed directly against the target and deal full damage; bullets are assumed to hit at close range.',
 'На расстоянии урон взрыва падает.':'Explosive damage decreases with distance.',
@@ -261,7 +261,7 @@ const KEY='ct_language', words={
 'NO ONE IS COMING TO SAVE YOU.':'НИКТО НЕ ПРИДЁТ ТЕБЯ СПАСАТЬ.',
 'UNOFFICIAL DAYZ FAN PROJECT':'НЕОФИЦИАЛЬНЫЙ ФАН-ПРОЕКТ DAYZ',
 
-,'RAID OPERATIONS // CHERNARUS':'RAID OPERATIONS // CHERNARUS',
+'RAID OPERATIONS // CHERNARUS':'RAID OPERATIONS // CHERNARUS',
 'RAID SYSTEM ACTIVE':'RAID SYSTEM ACTIVE',
 'VANILLA CONFIG DATA':'VANILLA CONFIG DATA',
 'REFERENCE // VANILLA CONFIG DATA':'REFERENCE // VANILLA CONFIG DATA',
