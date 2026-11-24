@@ -94,6 +94,41 @@ const KEY='ct_language', words={
 'Радиус зоны (условные метры)':'ZONE RADIUS (APPROX. METERS)',
 'Система архива запущена.':'Archive system initialized.',
 'ЛИЧНЫЕ ОТМЕТКИ':'PERSONAL MARKERS',
+'📍 Маркер':'📍 Marker','🎒 Лут':'🎒 Loot','🔴 PvP-зона':'🔴 PvP Zone','✕ Отменить режим добавления':'✕ Cancel Add Mode',
+'РАДИУС ЗОНЫ (УСЛОВНЫЕ МЕТРЫ)':'ZONE RADIUS (APPROX. METERS)','Название можно оставить пустым — система подставит стандартное.':'Leave the name blank and the system will use a default.',
+'↓ Экспорт отметок JSON':'↓ Export Markers JSON','↑ Импорт отметок JSON':'↑ Import Markers JSON','✕ Удалить все отметки':'✕ Delete All Markers',
+'CHERNARUS TALES — Тактическая карта':'CHERNARUS TALES — Tactical Map','← ГЛАВНЫЙ ТЕРМИНАЛ':'← MAIN TERMINAL',
+'ТОЧНОСТЬ ДАННЫХ.':'DATA ACCURACY.','Встроенная база рассчитана по игровым конфигам DayZ 1.30.164078.38 (источник ZIPANG). Взрывчатка предполагается установленной вплотную и наносящей полный урон; пули — на близкой дистанции. На расстоянии урон взрыва падает. Серверные моды и конфиги могут менять результат;':'The built-in database is based on DayZ 1.30.164078.38 game configs (ZIPANG source). Explosives are assumed to be placed directly against the target and deal full damage; bullets are assumed to hit at close range. Explosive damage decreases with distance. Server mods and configs may change the result;',
+'отключает урон по заборам и вышкам. Используй профиль «Свой сервер», если настройки отличаются.':'disables damage to fences and watchtowers. Use the “Custom Server” profile if your settings differ.',
+'01 // ЦЕЛЬ':'01 // TARGET','02 // ИНСТРУМЕНТ':'02 // TOOL','03 // РЕЗУЛЬТАТ':'03 // RESULT','04 // ВАЖНЫЕ ПРАВИЛА':'04 // IMPORTANT NOTES',
+'+ ДОБАВИТЬ В ПЛАН':'+ ADD TO PLAN','СБРОСИТЬ ОТМЕТКИ':'RESET CHECKS','Источник: анализ конфигов DayZ 1.30.164078.38; данные частей забора и вышки.':'Source: analysis of DayZ 1.30.164078.38 configs; fence and watchtower component data.',
+'Урон одного взрыва из конфигов версии 1.30. Дальность и падение урона зависят от расстояния до цели.':'Single-explosion damage from version 1.30 configs. Blast range and damage falloff depend on distance to the target.',
+'Значения базового урона боеприпасов из таблицы расчётов для версии 1.30. Пули считаются на близкой дистанции; на дальности урон может снижаться.':'Base ammunition damage values from the version 1.30 calculation table. Bullets are calculated at close range; damage may decrease over distance.',
+'Отметки сохраняются в localStorage этого браузера.':'Checkmarks are saved in this browser’s localStorage.',
+'Урон по части = базовый урон × множитель выбранной цели. Для пользовательского профиля введи параметры своего сервера.':'Damage per structure part = base damage × the selected target multiplier. Enter your server values for a custom profile.',
+'Выбери тип отметки, затем нажми на карту.':'Choose a marker type, then click the map.',
+'Встроенная база рассчитана по игровым конфигам':'The built-in database is based on game configs',
+'Здесь собраны материалы, заметки, истории и сведения,':'This archive contains materials, notes, stories and information,',
+'которые могут помочь тебе пережить ещё один день.':'that may help you survive another day.',
+'Архив событий, загадки заражения и информация':'An archive of events, the infection mystery and information',
+'о мире после начала катастрофы.':'about the world after the outbreak.',
+'Полезные сведения о поиске припасов,':'Useful information about finding supplies,',
+'передвижении и выживании в опасных районах.':'travel and survival in dangerous areas.',
+'Военные объекты, заражённые территории,':'Military sites, contaminated areas,',
+'заброшенные поселения и тайники.':'abandoned settlements and stashes.',
+'Неизвестные события, странные находки':'Unknown events, strange discoveries',
+'и информация, которую лучше не игнорировать.':'and information best not ignored.',
+'доверять можно не каждому.':'not everyone can be trusted.',
+'Используй её для планирования маршрутов,':'Use it to plan routes,',
+'поиска локаций и отметок важных мест.':'find locations and mark points of interest.',
+'Основные термины и выражения,':'Common terms and expressions,',
+'которые можно встретить в общении между выжившими.':'used when survivors communicate.',
+'убивать при встрече, без переговоров.':'kill on sight, without negotiation.',
+'Вопрос о намерениях встреченного игрока.':'A question about the intentions of another player.',
+'Предметы, оружие, еда и другие полезные вещи.':'Items, weapons, food and other useful supplies.',
+'Новый игрок, который только появился на побережье.':'A new player who has just spawned on the coast.',
+'Игрок с хорошим снаряжением и оружием.':'A player with good gear and weapons.',
+'База или укреплённое убежище игроков.':'A player-built base or fortified shelter.'
 'Состояние системы':'System Status','Подключение карты Chernarus…':'Connecting to Chernarus map…',
 'Режим включён: нажми на нужное место карты.':'Mode enabled: click the desired location on the map.',
 'Выбери тип отметки, затем нажми на карту.':'Choose a marker type, then click the map.',
@@ -129,9 +164,12 @@ let b=document.getElementById('ct-lang-toggle');if(b)b.textContent=lang==='en'?'
 localStorage.setItem(KEY,lang);
 }
 function init(){
-const host=document.querySelector('.system-right')||document.querySelector('.header-status')||document.querySelector('header')||document.body;
-const b=document.createElement('button');b.id='ct-lang-toggle';b.type='button';b.className='ct-lang-toggle';b.textContent='EN';b.setAttribute('aria-label','Switch language / Сменить язык');b.style.cssText='margin-left:10px;padding:5px 10px;border:1px solid #6eaa75;background:#102016;color:#b6f5a9;font:600 12px Consolas,monospace;cursor:pointer;min-width:42px;z-index:1002;';host.appendChild(b);
-b.addEventListener('click',()=>apply((localStorage.getItem(KEY)||'ru')==='ru'?'en':'ru'));
+const isMainPage=!!document.querySelector('header h1')&&document.querySelector('header h1').textContent.includes('CHERNARUS');
+if(isMainPage){
+ const host=document.querySelector('header');
+ const b=document.createElement('button');b.id='ct-lang-toggle';b.type='button';b.className='ct-lang-toggle';b.textContent='EN';b.setAttribute('aria-label','Switch language / Сменить язык');b.style.cssText='display:block;margin:12px auto 0;padding:7px 18px;border:1px solid #6eaa75;background:#102016;color:#b6f5a9;font:600 13px Consolas,monospace;cursor:pointer;min-width:58px;z-index:1002;box-shadow:0 0 12px #6bd27622;';host.appendChild(b);
+ b.addEventListener('click',()=>apply((localStorage.getItem(KEY)||'ru')==='ru'?'en':'ru'));
+}
 apply(localStorage.getItem(KEY)||'ru');
 window.addEventListener('storage',e=>{if(e.key===KEY)apply(e.newValue||'ru')});
 const observer=new MutationObserver(records=>{const lang=localStorage.getItem(KEY)||'ru';for(const rec of records){rec.addedNodes.forEach(n=>{if(n.nodeType===Node.TEXT_NODE)translateNode(n,lang);else if(n.nodeType===Node.ELEMENT_NODE)translateTree(n,lang)})}});
