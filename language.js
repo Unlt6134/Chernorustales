@@ -322,6 +322,7 @@ function translateText(text,lang){let out=text;for(const [from,to] of (lang==='e
 const originals=new WeakMap();
 function translateNode(node,lang){
  if(!node||node.nodeType!==Node.TEXT_NODE)return;
+ if(node.parentElement?.closest('[data-ct-fixed-en]'))return;
  let record=originals.get(node);
  if(!record){record={original:node.nodeValue,last:node.nodeValue};originals.set(node,record)}
  else if(node.nodeValue!==record.last){record.original=node.nodeValue}
