@@ -122,6 +122,8 @@ function translateTree(root,lang){
 function apply(lang){
 lang=lang==='en'?'en':'ru';document.documentElement.lang=lang;
 translateTree(document.body,lang);
+document.title=translateText(document.title,lang);
+const description=document.querySelector('meta[name="description"]');if(description){if(!description.dataset.ctOriginal)description.dataset.ctOriginal=description.content;description.content=translateText(description.dataset.ctOriginal,lang)}
 document.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el=>['placeholder','title','aria-label'].forEach(attr=>{const v=el.getAttribute(attr);if(v)el.setAttribute(attr,translateText(v,lang))}));
 let b=document.getElementById('ct-lang-toggle');if(b)b.textContent=lang==='en'?'RU':'EN';
 localStorage.setItem(KEY,lang);
