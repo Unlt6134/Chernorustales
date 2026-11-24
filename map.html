@@ -107,9 +107,12 @@ button{background:#0b170eeb;color:var(--g);border:1px solid var(--line);min-widt
 </div>
 <div class="controls"><button id="plus" aria-label="Приблизить" title="Приблизить">+</button><button id="minus" aria-label="Отдалить" title="Отдалить">−</button><button id="reset" aria-label="Сбросить масштаб" title="Сбросить масштаб">⌂</button><button id="toggleLabels" aria-label="Скрыть все названия" title="Скрыть все названия">A</button></div>
 </div>
+<script src="language.js"></script>
 <script>
 (()=>{const v=document.getElementById('viewport'),layer=document.getElementById('mapLayer'),img=document.getElementById('paper'),label=document.getElementById('zoomLabel'),toggle=document.getElementById('toggleLabels');let scale=1,tx=0,ty=0,pts=new Map(),drag=null,pinch=null,labelsVisible=true;
 function paint(){layer.style.transform='translate(calc(-50% + '+tx+'px),calc(-50% + '+ty+'px)) scale('+scale+')';label.textContent=Math.round(scale*100)+'%'}
+function syncMapLanguage(){const lang=localStorage.getItem('ct_language')==='en'?'en':'ru';document.documentElement.lang=lang;document.querySelector('.bar span').textContent=lang==='en'?'CHERNARUS TALES // MAP':'CHERNARUS TALES // КАРТА';img.alt=lang==='en'?'DayZ Chernarus map, 4000 by 4000':'Карта Черноруси DayZ, 4000 на 4000';document.getElementById('labels').setAttribute('aria-label',lang==='en'?'Town and village names':'Названия городов и деревень');const names={Черногорск:'Chernogorsk',Новодмитровск:'Novodmitrovsk',Березино:'Berezino',Электрозаводск:'Elektrozavodsk',Зеленогорск:'Zelenogorsk',Североград:'Severograd',Светлоярск:'Svetloyarsk','Новая Петровка':'Novaya Petrovka',Красностав:'Krasnostav',Выбор:'Vybor',Горка:'Gorka',Поляна:'Polyana',Солнечный:'Solnichniy','Старый Собор':'Staroye Sobor','Черная Поляна':'Chernaya Polyana',Дубово:'Dubovo',Новоселки:'Novoselki',Высотово:'Vyshnoye'};document.querySelectorAll('#labels text').forEach(el=>{if(!el.dataset.ru)el.dataset.ru=el.textContent;el.textContent=lang==='en'?(names[el.dataset.ru]||el.dataset.ru):el.dataset.ru});toggle.setAttribute('aria-label',lang==='en'?(labelsVisible?'Hide all labels':'Show all labels'):(labelsVisible?'Скрыть все названия':'Показать все названия'));toggle.title=toggle.getAttribute('aria-label')}
+window.addEventListener('ct-language-change',syncMapLanguage);window.addEventListener('storage',e=>{if(e.key==='ct_language')syncMapLanguage()});
 function clamp(){scale=Math.max(.35,Math.min(8,scale))}
 function point(e){const r=v.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
 function mid(a,b){return{x:(a.x+b.x)/2,y:(a.y+b.y)/2}}
@@ -119,8 +122,8 @@ v.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.p
 function end(e){pts.delete(e.pointerId);if(pinch){pinch=null;drag=null;if(pts.size===1){const [id,p]=[...pts.entries()][0];drag={id,p,tx,ty}}}else if(drag&&drag.id===e.pointerId)drag=null}
 v.addEventListener('pointerup',end);v.addEventListener('pointercancel',end);
 v.addEventListener('wheel',e=>{e.preventDefault();const old=scale;scale*=e.deltaY<0?1.15:1/1.15;clamp();const r=v.getBoundingClientRect(),p=point(e);tx=p.x-r.width/2-(p.x-r.width/2-tx)*scale/old;ty=p.y-r.height/2-(p.y-r.height/2-ty)*scale/old;paint()},{passive:false});
-document.getElementById('plus').onclick=()=>{scale*=1.25;clamp();paint()};document.getElementById('minus').onclick=()=>{scale/=1.25;clamp();paint()};document.getElementById('reset').onclick=()=>{scale=1;tx=ty=0;paint()};toggle.onclick=()=>{labelsVisible=!labelsVisible;v.classList.toggle('labels-hidden',!labelsVisible);toggle.textContent=labelsVisible?'A':'A̸';toggle.setAttribute('aria-label',labelsVisible?'Скрыть все названия':'Показать все названия');toggle.title=labelsVisible?'Скрыть все названия':'Показать все названия'};
-img.addEventListener('load',()=>{scale=1;tx=ty=0;paint()});paint();
+document.getElementById('plus').onclick=()=>{scale*=1.25;clamp();paint()};document.getElementById('minus').onclick=()=>{scale/=1.25;clamp();paint()};document.getElementById('reset').onclick=()=>{scale=1;tx=ty=0;paint()};toggle.onclick=()=>{labelsVisible=!labelsVisible;v.classList.toggle('labels-hidden',!labelsVisible);toggle.textContent=labelsVisible?'A':'A̸';toggle.setAttribute('aria-label',document.documentElement.lang==='en'?(labelsVisible?'Hide all labels':'Show all labels'):(labelsVisible?'Скрыть все названия':'Показать все названия'));toggle.title=toggle.getAttribute('aria-label')};
+img.addEventListener('load',()=>{scale=1;tx=ty=0;paint()});syncMapLanguage();paint();
 })();
 </script>
 </body></html>
