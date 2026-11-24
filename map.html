@@ -9,29 +9,111 @@
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#d0ded1;font:13px "Courier New",monospace}
 body{display:flex;flex-direction:column}.bar{height:42px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#0b170e;border-bottom:1px solid var(--line);letter-spacing:1px;color:var(--g);font-size:11px}
 .viewport{position:relative;flex:1;overflow:hidden;background:#101810;touch-action:none;cursor:grab}.viewport:active{cursor:grabbing}
-#paper{position:absolute;max-width:none;width:auto;height:auto;left:50%;top:50%;transform:translate(-50%,-50%) scale(1);transform-origin:center;user-select:none;-webkit-user-drag:none;pointer-events:none}
+#mapLayer{position:absolute;left:50%;top:50%;width:min(100vw,calc(100vh - 42px));aspect-ratio:1;transform:translate(-50%,-50%) scale(1);transform-origin:center;user-select:none;pointer-events:none}
+#paper{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none}
+#labels{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#labels text{font-family:"Courier New",monospace;text-anchor:middle;paint-order:stroke;stroke:#07110a;stroke-width:58;stroke-linejoin:round;fill:#b5e0b5;letter-spacing:5px}
+#labels .city{font-size:245px;font-weight:bold;fill:#c4efc2;stroke-width:82}
+#labels .village{font-size:175px;fill:#a9d3ac;opacity:.92}
 .controls{position:absolute;right:10px;top:10px;z-index:2;display:flex;flex-direction:column;gap:5px}
 button{background:#0b170eeb;color:var(--g);border:1px solid var(--line);min-width:38px;height:38px;font:18px "Courier New";border-radius:2px}
-.note{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 80px);background:#07110add;border:1px solid var(--line);padding:7px 9px;font-size:10px;color:#aebdaf}
+.note{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 80px);background:#07110add;border:1px solid var(--line);padding:7px 9px;font-size:10px;color:#aebdaf;z-index:2}
 @media(min-width:900px){.bar{height:46px}.note{font-size:11px}}
 </style>
 </head>
 <body>
 <div class="bar"><span>CHERNARUS TALES // КАРТА</span><span id="zoomLabel">100%</span></div>
 <div class="viewport" id="viewport">
-<img id="paper" alt="Бумажная карта Черноруси DayZ" draggable="false" src="https://www.xzone.cz/download/products/ObhcIO921.jpg">
+<div id="mapLayer">
+<img id="paper" alt="Карта Черноруси DayZ, 4000 на 4000" draggable="false" src="https://i.redd.it/a2mn8bzx93gd1.jpeg">
+<svg id="labels" viewBox="0 0 15360 15360" preserveAspectRatio="none" aria-label="Названия городов и деревень">
+<text class="city" x="6779" y="13038">Черногорск</text>
+<text class="city" x="10287" y="13367">Электрозаводск</text>
+<text class="city" x="12372" y="5599">Березино</text>
+<text class="city" x="13990" y="2096">Светлоярск</text>
+<text class="city" x="11340" y="969">Новодмитровск</text>
+<text class="city" x="8168" y="2786">Североград</text>
+<text class="city" x="3477" y="2429">Новая Петровка</text>
+<text class="city" x="3910" y="6340">Выбор</text>
+<text class="city" x="2796" y="10194">Зеленогорск</text>
+<text class="city" x="9524" y="6415">Горка</text>
+<text class="city" x="11203" y="3019">Красностав</text>
+<text class="city" x="13488" y="9134">Солнечный</text>
+<text class="city" x="10794" y="7200">Полана</text>
+<text class="city" x="6114" y="7511">Старый Собор</text>
+<text class="city" x="4528" y="12895">Балота</text>
+<text class="city" x="1981" y="13153">Каменка</text>
+<text class="city" x="12170" y="11902">Камышово</text>
+<text class="city" x="6116" y="12104">Новоселки</text>
+<text class="city" x="6754" y="11765">Дубово</text>
+<text class="city" x="5701" y="12804">Высотово</text>
+<text class="village" x="3442" y="560">Тисы</text>
+<text class="village" x="5980" y="5103">Гришино</text>
+<text class="village" x="5301" y="6714">Кабанино</text>
+<text class="village" x="2048" y="8102">Мышкино</text>
+<text class="village" x="1694" y="11501">Павлово</text>
+<text class="village" x="3702" y="12920">Комарово</text>
+<text class="village" x="4402" y="10624">Козловка</text>
+<text class="village" x="3374" y="10499">Дрожжино</text>
+<text class="village" x="5015" y="9753">Пулково</text>
+<text class="village" x="7650" y="10264">Могилевка</text>
+<text class="village" x="5894" y="10580">Надеждино</text>
+<text class="village" x="2556" y="9053">Сосновка</text>
+<text class="village" x="4802" y="8612">Рогово</text>
+<text class="village" x="4445" y="9038">Погоревка</text>
+<text class="village" x="11285" y="8726">Долина</text>
+<text class="village" x="8445" y="8781">Гуглово</text>
+<text class="village" x="9729" y="8793">Шаковка</text>
+<text class="village" x="11334" y="9939">Мста</text>
+<text class="village" x="10212" y="9975">Старое</text>
+<text class="village" x="5956" y="1802">Полесово</text>
+<text class="village" x="8645" y="3426">Гвоздно</text>
+<text class="village" x="7448" y="1954">Калинковка</text>
+<text class="village" x="6749" y="930">Камensk</text>
+<text class="village" x="8510" y="1441">Арсеньево</text>
+<text class="village" x="13630" y="1214">Турово</text>
+<text class="village" x="12158" y="1590">Черная Поляна</text>
+<text class="village" x="15020" y="1455">Бережки</text>
+<text class="village" x="14166" y="392">Белая Поляна</text>
+<text class="village" x="5214" y="2568">Запрудное</text>
+<text class="village" x="6196" y="2598">Ратное</text>
+<text class="village" x="2263" y="4257">Вавилово</text>
+<text class="village" x="2801" y="5331">Лопатино</text>
+<text class="village" x="3138" y="7469">Пустошка</text>
+<text class="village" x="4988" y="367">Старый Яр</text>
+<text class="village" x="2914" y="2994">Топольники</text>
+<text class="village" x="1538" y="3455">Синисток</text>
+<text class="village" x="1257" y="5367">Заболотье</text>
+<text class="village" x="1103" y="6562">Галкино</text>
+<text class="village" x="4913" y="10297">Кустрык</text>
+<text class="village" x="2843" y="11345">Ербенка</text>
+<text class="village" x="2789" y="11974">Марьянка</text>
+<text class="village" x="6629" y="9309">Вышное</text>
+<text class="village" x="7760" y="12024">Пригородки</text>
+<text class="village" x="6749" y="930">Каменск</text>
+<text class="village" x="10324" y="5472">Дубровка</text>
+<text class="village" x="12329" y="4589">Кельм</text>
+<text class="village" x="12825" y="7262">Нижнее</text>
+<text class="village" x="12768" y="10976">Тулга</text>
+<text class="village" x="9197" y="11487">Пуста</text>
+<text class="village" x="3138" y="7469">Пустошка</text>
+<text class="village" x="6411" y="330">Кrasnoe</text>
+<text class="village" x="3346" y="4068">Калинка</text>
+<text class="village" x="9494" y="1485">Свергино</text>
+</svg>
+</div>
 <div class="controls"><button id="plus" aria-label="Приблизить">+</button><button id="minus" aria-label="Отдалить">−</button><button id="reset" aria-label="Сбросить масштаб">⌂</button></div>
-<div class="note">Карта Черноруси · Bohemia Interactive / DayZ · Перемещение — одним пальцем или мышью, масштаб — двумя пальцами или колёсиком</div>
+<div class="note">ЧЕРНОРУСЬ // 4000×4000 · Города — яркие метки, деревни — приглушённые · Перемещение — одним пальцем или мышью, масштаб — двумя пальцами или колёсиком</div>
 </div>
 <script>
-(()=>{const v=document.getElementById('viewport'),img=document.getElementById('paper'),label=document.getElementById('zoomLabel');let scale=1,tx=0,ty=0,pts=new Map(),drag=null,pinch=null;
-function paint(){img.style.transform='translate(calc(-50% + '+tx+'px),calc(-50% + '+ty+'px)) scale('+scale+')';label.textContent=Math.round(scale*100)+'%'}
-function clamp(){scale=Math.max(.35,Math.min(6,scale))}
+(()=>{const v=document.getElementById('viewport'),layer=document.getElementById('mapLayer'),img=document.getElementById('paper'),label=document.getElementById('zoomLabel');let scale=1,tx=0,ty=0,pts=new Map(),drag=null,pinch=null;
+function paint(){layer.style.transform='translate(calc(-50% + '+tx+'px),calc(-50% + '+ty+'px)) scale('+scale+')';label.textContent=Math.round(scale*100)+'%'}
+function clamp(){scale=Math.max(.35,Math.min(8,scale))}
 function point(e){const r=v.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
 function mid(a,b){return{x:(a.x+b.x)/2,y:(a.y+b.y)/2}}
 function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
 v.addEventListener('pointerdown',e=>{v.setPointerCapture(e.pointerId);pts.set(e.pointerId,point(e));if(pts.size===2){const a=[...pts.values()];pinch={d:dist(a[0],a[1]),scale,mid:mid(a[0],a[1]),tx,ty};drag=null}else if(pts.size===1){drag={id:e.pointerId,p:point(e),tx,ty}}});
-v.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,point(e));if(pts.size>=2&&pinch){const a=[...pts.values()],m=mid(a[0],a[1]),oldScale=scale,factor=dist(a[0],a[1])/Math.max(1,pinch.d);scale=pinch.scale*factor;clamp();const rect=v.getBoundingClientRect(),cx=rect.width/2,cy=rect.height/2,ratio=scale/pinch.scale;tx=m.x-cx-(pinch.mid.x-cx-pinch.tx)*ratio;ty=m.y-cy-(pinch.mid.y-cy-pinch.ty)*ratio;paint()}else if(drag&&drag.id===e.pointerId){const p=point(e);tx=drag.tx+p.x-drag.p.x;ty=drag.ty+p.y-drag.p.y;paint()}});
+v.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,point(e));if(pts.size>=2&&pinch){const a=[...pts.values()],m=mid(a[0],a[1]),factor=dist(a[0],a[1])/Math.max(1,pinch.d);scale=pinch.scale*factor;clamp();const rect=v.getBoundingClientRect(),cx=rect.width/2,cy=rect.height/2,ratio=scale/pinch.scale;tx=m.x-cx-(pinch.mid.x-cx-pinch.tx)*ratio;ty=m.y-cy-(pinch.mid.y-cy-pinch.ty)*ratio;paint()}else if(drag&&drag.id===e.pointerId){const p=point(e);tx=drag.tx+p.x-drag.p.x;ty=drag.ty+p.y-drag.p.y;paint()}});
 function end(e){pts.delete(e.pointerId);if(pinch){pinch=null;drag=null;if(pts.size===1){const [id,p]=[...pts.entries()][0];drag={id,p,tx,ty}}}else if(drag&&drag.id===e.pointerId)drag=null}
 v.addEventListener('pointerup',end);v.addEventListener('pointercancel',end);
 v.addEventListener('wheel',e=>{e.preventDefault();const old=scale;scale*=e.deltaY<0?1.15:1/1.15;clamp();const r=v.getBoundingClientRect(),p=point(e);tx=p.x-r.width/2-(p.x-r.width/2-tx)*scale/old;ty=p.y-r.height/2-(p.y-r.height/2-ty)*scale/old;paint()},{passive:false});
