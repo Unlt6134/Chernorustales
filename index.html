@@ -844,6 +844,21 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
 .archive-file{line-height:1.48}
 .archive-file p,.archive-file li{line-height:1.48;margin:8px 0}
 .archive-file ul{padding-left:19px;margin:10px 0}
+
+/* FIXED ARCHIVE NAVIGATION */
+#archive-menu{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0 28px}
+#archive-menu[hidden]{display:none!important}
+#archive-menu .archive-menu-button{appearance:none;-webkit-appearance:none;width:100%;min-width:0;min-height:116px;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:8px!important;padding:17px 18px!important;text-align:left!important;white-space:normal!important;overflow-wrap:anywhere;color:var(--text)!important;background:linear-gradient(120deg,rgba(19,39,23,.96),rgba(7,14,9,.98))!important;border:1px solid var(--border)!important;border-left:3px solid var(--green)!important;border-radius:0!important;box-shadow:none!important;cursor:pointer}
+#archive-menu .archive-menu-button:hover{border-color:var(--green)!important;background:linear-gradient(120deg,rgba(31,59,35,.98),rgba(9,19,11,.99))!important}
+#archive-menu .archive-menu-code,#archive-menu .archive-menu-title,#archive-menu .archive-menu-hint{display:block!important;width:100%;line-height:1.35!important;white-space:normal!important}
+#archive-menu .archive-menu-code{font-size:9px!important;letter-spacing:1.8px!important;color:var(--green)!important;opacity:.8}
+#archive-menu .archive-menu-title{font:600 19px/1.25 'Oswald','Share Tech Mono',monospace!important;color:var(--bright)!important}
+#archive-menu .archive-menu-hint{font-size:10px!important;letter-spacing:.6px!important;color:var(--muted)!important;margin-top:auto}
+#home .archive-files{display:block!important;grid-template-columns:none!important;margin:0!important}
+#home .archive-files>.archive-file{display:none!important;max-width:900px;margin:0 auto 24px!important}
+#home .archive-files>.archive-file.is-open{display:block!important}
+#home .archive-file .archive-back{display:inline-flex!important;align-items:center;gap:8px;margin:0 0 16px;padding:9px 12px;border:1px solid var(--border);background:rgba(17,31,20,.8);color:var(--green);font:11px 'Share Tech Mono',monospace;cursor:pointer}
+@media(max-width:620px){#archive-menu{grid-template-columns:1fr!important;gap:9px;margin:18px 0 24px}#archive-menu .archive-menu-button{min-height:94px;padding:13px 14px!important}#archive-menu .archive-menu-title{font-size:17px!important}#home .archive-files>.archive-file.is-open{padding:15px 14px}}
 </style>
 <style>
       .ct-lang-toggle{display:inline-block!important;position:relative;z-index:20;margin:14px auto 4px;padding:8px 20px;min-width:64px;border:1px solid #78c982;border-radius:3px;background:#102016;color:#c2ffc2;font:700 13px Consolas,monospace;letter-spacing:1px;cursor:pointer;box-shadow:0 0 14px rgba(107,210,118,.18)}
