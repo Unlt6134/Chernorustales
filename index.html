@@ -1187,7 +1187,7 @@ function render(){
 const lang=localStorage.getItem('ct_language')==='en'?'en':'ru';
 const list=document.getElementById('phraseList');if(!list)return;
 const shown=entries.filter(x=>active==='all'||x.c===active);
-list.innerHTML=shown.map((x,i)=>'<article class="phrase-card"><div class="phrase-code">'+x.c.toUpperCase()+' // '+String(i+1).padStart(2,'0')+'</div><div class="phrase-main">'+esc(lang==='ru'?x.en:x.ru)+'</div><div class="phrase-translation">'+esc(lang==='ru'?x.ru:x.en)+'</div></article>').join('');
+list.innerHTML=shown.map((x,i)=>'<article class="phrase-card"><div class="phrase-code">'+x.c.toUpperCase()+' // '+String(i+1).padStart(2,'0')+'</div><div class="phrase-main">'+esc(lang==='ru'?x.en:x.ru)+'</div>'+(lang==='ru'?'<div class="phrase-phonetic">'+esc(x.phon)+'</div>':'')+'<div class="phrase-translation">'+esc(lang==='ru'?x.ru:x.en)+'</div></article>').join('');
 document.querySelectorAll('.phrase-category').forEach(b=>{b.classList.toggle('active',b.dataset.category===active);b.textContent=lang==='en'?({all:'All phrases',aggression:'Aggression',questions:'Questions',friendly:'Friendly contact',trade:'Trade & help',navigation:'Places & directions',team:'Team communication',danger:'Danger'}[b.dataset.category]):names[b.dataset.category]});
 }
 document.querySelectorAll('.phrase-category').forEach(b=>b.addEventListener('click',()=>{active=b.dataset.category;render()}));
