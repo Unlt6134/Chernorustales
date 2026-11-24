@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071008">
+<title>RAID CALCULATOR // CHERNARUS TALES</title>
+<style>
+:root{color-scheme:dark;--bg:#070b08;--panel:#0d160f;--panel2:#101d13;--line:#29452d;--green:#8be28d;--muted:#91a493;--text:#d8e5d8;--warn:#e6c36c;--red:#df7777}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0,#132417 0,#070b08 55%);color:var(--text);font:14px/1.55 Consolas,"Courier New",monospace;padding:22px}
+.wrap{max-width:1180px;margin:auto;border:1px solid var(--line);background:#080e09;box-shadow:0 0 35px #000a,0 0 20px #16351a33}
+header,.bar,footer{padding:14px 20px;border-bottom:1px solid var(--line);background:#0b130d}header{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}.brand{font-size:clamp(18px,3vw,26px);letter-spacing:2px;color:var(--green);text-shadow:0 0 12px #5cbd62}.sub{color:var(--muted);font-size:11px;letter-spacing:1px}
+main{padding:20px}.notice{border:1px solid #66552c;background:#211b0d;color:#e7d49e;padding:12px 14px;margin-bottom:18px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.panel{border:1px solid var(--line);background:linear-gradient(145deg,var(--panel2),var(--panel));padding:16px;min-width:0}.panel h2{margin:0 0 14px;color:var(--green);font-size:16px;letter-spacing:1px}.wide{grid-column:1/-1}
+label{display:block;color:var(--muted);font-size:11px;margin:9px 0 5px}input,select,textarea{width:100%;background:#050a06;border:1px solid #36553a;color:var(--text);padding:10px;font:inherit;min-width:0}input:focus,select:focus{outline:1px solid var(--green);border-color:var(--green)}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+button,.btn{border:1px solid #4a794e;background:#122416;color:var(--green);padding:9px 12px;font:inherit;cursor:pointer}button:hover,.btn:hover{background:#1b3420}button.danger{border-color:#784444;color:#e99b9b;background:#211010}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.metric{font-size:clamp(20px,3vw,30px);color:var(--green);font-weight:bold}.muted{color:var(--muted);font-size:11px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.stat{border:1px solid var(--line);padding:12px;background:#080f09}.stat small{display:block;color:var(--muted);font-size:10px}.stat strong{display:block;font-size:18px;color:var(--green);overflow-wrap:anywhere}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}th,td{text-align:left;padding:8px;border-bottom:1px solid #233827}th{color:var(--muted);font-weight:normal}td button{padding:4px 7px;font-size:11px}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.tabs button.active{background:#24452a;border-color:var(--green);box-shadow:0 0 10px #6cda7033}
+[hidden]{display:none!important}.empty{color:var(--muted);padding:16px;text-align:center;border:1px dashed var(--line);margin-top:10px}
+footer{border-top:1px solid var(--line);border-bottom:0;color:var(--muted);font-size:10px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:720px){body{padding:0}.wrap{border-left:0;border-right:0}.grid{grid-template-columns:1fr}main{padding:12px}.wide{grid-column:auto}.stats{grid-template-columns:1fr 1fr}.row3{grid-template-columns:1fr 1fr}.row3>div:first-child{grid-column:1/-1}header{padding:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div><div class="brand">CHERNARUS TALES // RAID CALCULATOR</div><div class="sub">FIELD ENGINEERING TOOL // OFFLINE LOCAL PROFILE</div></div><a href="index.html">← BACK TO TERMINAL</a></header>
+<main>
+<div class="notice"><b>ВАЖНО О ДОСТОВЕРНОСТИ.</b> В DayZ урон по постройкам зависит от типа конструкции, материала, версии игры и серверных конфигураций. Здесь намеренно нет выдуманных «официальных» цифр: внеси HP и урон из проверенных данных своего сервера. Все значения сохраняются локально в этом браузере.</div>
+<div class="tabs"><button class="active" data-tab="calc">РАСЧЁТ РЕЙДА</button><button data-tab="arsenal">АРСЕНАЛ</button><button data-tab="repair">РЕМОНТ ОРУЖИЯ</button></div>
+<section id="calc">
+<div class="grid">
+<div class="panel"><h2>[01] ЦЕЛЬ / ПОСТРОЙКА</h2>
+<label for="building">Тип конструкции</label><select id="building"><option>Деревянная стена</option><option>Металлическая стена</option><option>Ворота</option><option>Дверь</option><option>Башня / секция забора</option><option>Другое</option></select>
+<div class="row"><div><label for="hp">Базовое HP конструкции</label><input id="hp" type="number" min="0" step="1" value="0"></div><div><label for="mult">Множитель HP</label><select id="mult"><option value="1">1×</option><option value="2">2×</option><option value="3">3×</option><option value="5">5×</option><option value="10">10×</option><option value="custom">Свой</option></select></div></div>
+<div id="customWrap" hidden><label for="customMult">Свой множитель</label><input id="customMult" type="number" min=".01" step=".01" value="1"></div>
+<div class="muted">Введи HP из конфигурации сервера или проверенного источника. Тип конструкции — только метка, автоматическое HP не подставляется.</div>
+<div class="stats"><div class="stat"><small>ЭФФЕКТИВНОЕ HP</small><strong id="effective">0</strong></div><div class="stat"><small>УРОН В НАБОРЕ</small><strong id="total">0</strong></div><div class="stat"><small>ОСТАТОК HP</small><strong id="remaining">0</strong></div></div></div>
+<div class="panel"><h2>[02] ДОБАВИТЬ В НАБОР</h2>
+<label for="itemSelect">Предмет арсенала</label><select id="itemSelect"></select>
+<div class="row"><div><label for="qty">Количество</label><input id="qty" type="number" min="1" step="1" value="1"></div><div><label for="unitDamage">Урон за единицу (из арсенала)</label><input id="unitDamage" type="number" min="0" step="any" value="0"></div></div>
+<div class="muted">Урон можно переопределить для текущего расчёта, не меняя запись арсенала.</div><div class="actions"><button id="addLoadout">+ ДОБАВИТЬ В РАСЧЁТ</button><button id="clearLoadout" class="danger">ОЧИСТИТЬ НАБОР</button></div>
+</div>
+<div class="panel wide"><h2>[03] СОСТАВ РЕЙДА</h2><div id="loadout"></div><div class="muted" id="verdict">Укажи HP постройки и добавь предметы с проверенными значениями урона.</div></div>
+</div>
+</section>
+<section id="arsenal" hidden><div class="grid">
+<div class="panel"><h2>[04] СПРАВОЧНИК АРСЕНАЛА</h2><div class="muted">Добавляй ванильные или серверные предметы. Названия ниже — стартовые примеры предметов, не подтверждение их эффективности против построек.</div><div id="arsenalList"></div><div class="actions"><button id="export">ЭКСПОРТ JSON</button><button id="importBtn">ИМПОРТ JSON</button><input id="importFile" type="file" accept="application/json" hidden></div></div>
+<div class="panel"><h2 id="editorTitle">[05] НОВАЯ ЗАПИСЬ</h2><input id="editId" type="hidden">
+<label for="itemName">Название</label><input id="itemName" maxlength="70" placeholder="Например, Plastic Explosive">
+<div class="row"><div><label for="category">Категория</label><select id="category"><option>Взрывчатка</option><option>Оружие</option><option>Инструмент / другое</option></select></div><div><label for="damage">Урон по выбранной цели</label><input id="damage" type="number" min="0" step="any" value="0"></div></div>
+<label for="source">Источник / примечание</label><input id="source" maxlength="180" placeholder="Версия игры, серверный конфиг, ссылка или заметка">
+<div class="actions"><button id="saveItem">СОХРАНИТЬ</button><button id="resetEditor">СБРОСИТЬ</button></div>
+<div class="muted">Урон 0 означает «не задан». Не оставляй ноль, если хочешь получить содержательный расчёт.</div></div></div></section>
+<section id="repair" hidden><div class="grid">
+<div class="panel"><h2>[06] ОЦЕНКА РЕМОНТА</h2>
+<label for="rounds">Всего выстрелов за рейд (суммарно)</label><input id="rounds" type="number" min="0" step="1" value="300">
+<label for="wear">Оценочный износ прочности оружия на 100 выстрелов (%)</label><input id="wear" type="number" min="0" step=".1" value="5">
+<label for="recovery">Восстановление одним ремкомплектом (процентных пунктов прочности)</label><input id="recovery" type="number" min=".1" step=".1" value="25">
+<div class="stats"><div class="stat"><small>РАСЧЁТНЫЙ ИЗНОС</small><strong id="wearTotal">0%</strong></div><div class="stat"><small>РЕМКОМПЛЕКТОВ</small><strong id="kits">0</strong></div></div></div>
+<div class="panel"><h2>[07] КАК ЧИТАТЬ ОЦЕНКУ</h2><p>Формула: <b>выстрелы ÷ 100 × износ на 100 выстрелов ÷ восстановление одним комплектом</b>, округление вверх.</p><p class="muted">Это упрощённая плановая оценка, а не точная симуляция износа DayZ. Реальный износ зависит от оружия, состояния, типа боеприпаса, действий и серверных настроек. Подставь свои измерения для конкретного сервера.</p><button id="resetRepair">СБРОСИТЬ К ПРИМЕРУ</button></div>
+</div></section>
+</main>
+<footer><span>CHERNARUS TALES // SURVIVAL SYSTEMS</span><span>LOCAL STORAGE ENABLED // VALUES ARE CONFIGURABLE</span></footer>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), KEY='ct_raid_calculator_v1';
+const starter=[
+{name:'Plastic Explosive',category:'Взрывчатка',damage:0,source:'Ванильный предмет; урон не задан — внеси проверенное значение.'},
+{name:'Remote Detonation Unit',category:'Взрывчатка',damage:0,source:'Ванильный предмет; урон не задан — внеси проверенное значение.'},
+{name:'M79 Grenade Launcher',category:'Оружие',damage:0,source:'Ванильное оружие; урон по постройкам не задан.'},
+{name:'Grenade (M67)',category:'Взрывчатка',damage:0,source:'Ванильный предмет; урон по постройкам не задан.'},
+{name:'Claymore Mine',category:'Взрывчатка',damage:0,source:'Ванильный предмет; урон по постройкам не задан.'}
+];
+let state={arsenal:starter,loadout:[]};
+try{const saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&Array.isArray(saved.arsenal)&&Array.isArray(saved.loadout))state=saved}catch(e){}
+const persist=()=>localStorage.setItem(KEY,JSON.stringify(state));
+const num=v=>Math.max(0,Number(v)||0), fmt=v=>Number(v.toLocaleString('ru-RU',{maximumFractionDigits:2}));
+const mult=()=> $('mult').value==='custom'?Math.max(0,Number($('customMult').value)||0):Number($('mult').value);
+function calc(){
+ const hp=num($('hp').value)*mult(), total=state.loadout.reduce((s,x)=>s+x.damage*x.qty,0), rem=Math.max(0,hp-total);
+ $('effective').textContent=fmt(hp);$('total').textContent=fmt(total);$('remaining').textContent=fmt(rem);
+ $('verdict').textContent=hp<=0?'Укажи базовое HP больше нуля.':total>=hp?'Расчётный урон покрывает HP цели. Проверь реальные значения сервера.':'Не хватает '+fmt(hp-total)+' условных единиц урона.';
+}
+function renderLoadout(){
+ const host=$('loadout');if(!state.loadout.length){host.innerHTML='<div class="empty">НАБОР ПУСТ — ДОБАВЬ ПРЕДМЕТЫ СПРАВА</div>'}
+ else{host.innerHTML='<table><thead><tr><th>ПРЕДМЕТ</th><th>КОЛ-ВО</th><th>УРОН / ЕД.</th><th>ИТОГО</th><th></th></tr></thead><tbody>'+state.loadout.map((x,i)=>'<tr><td>'+esc(x.name)+'</td><td>'+x.qty+'</td><td>'+fmt(x.damage)+'</td><td>'+fmt(x.qty*x.damage)+'</td><td><button data-remove="'+i+'" class="danger">×</button></td></tr>').join('')+'</tbody></table>'}
+ host.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{state.loadout.splice(Number(b.dataset.remove),1);persist();renderLoadout()});calc();
+}
+function renderSelect(){const s=$('itemSelect');s.innerHTML=state.arsenal.map((x,i)=>'<option value="'+i+'">'+esc(x.name)+' — '+fmt(num(x.damage))+'</option>').join('');s.dispatchEvent(new Event('change'))}
+function renderArsenal(){const h=$('arsenalList');h.innerHTML='<table><thead><tr><th>НАЗВАНИЕ</th><th>ТИП</th><th>УРОН</th><th></th></tr></thead><tbody>'+state.arsenal.map((x,i)=>'<tr><td>'+esc(x.name)+'<div class="muted">'+esc(x.source||'')+'</div></td><td>'+esc(x.category)+'</td><td>'+fmt(num(x.damage))+'</td><td><button data-edit="'+i+'">EDIT</button> <button class="danger" data-del="'+i+'">DEL</button></td></tr>').join('')+'</tbody></table>';
+h.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>edit(Number(b.dataset.edit)));h.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.arsenal.splice(Number(b.dataset.del),1);persist();renderAll()})}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function resetEditor(){$('editId').value='';$('itemName').value='';$('category').value='Взрывчатка';$('damage').value='0';$('source').value='';$('editorTitle').textContent='[05] НОВАЯ ЗАПИСЬ'}
+function edit(i){const x=state.arsenal[i];$('editId').value=i;$('itemName').value=x.name;$('category').value=x.category;$('damage').value=x.damage;$('source').value=x.source||'';$('editorTitle').textContent='[05] РЕДАКТИРОВАТЬ ЗАПИСЬ'}
+function renderAll(){renderSelect();renderArsenal();renderLoadout();persist()}
+$('itemSelect').onchange=()=>{const x=state.arsenal[Number($('itemSelect').value)];$('unitDamage').value=x?num(x.damage):0};
+$('addLoadout').onclick=()=>{const x=state.arsenal[Number($('itemSelect').value)];if(!x)return;const qty=Math.max(1,Math.floor(num($('qty').value))),damage=num($('unitDamage').value);state.loadout.push({name:x.name,qty,damage});persist();renderLoadout()};
+$('clearLoadout').onclick=()=>{state.loadout=[];persist();renderLoadout()};
+$('saveItem').onclick=()=>{const name=$('itemName').value.trim();if(!name){alert('Введи название предмета.');return}const item={name,category:$('category').value,damage:num($('damage').value),source:$('source').value.trim()};const id=$('editId').value;if(id==='')state.arsenal.push(item);else state.arsenal[Number(id)]=item;resetEditor();renderAll()};
+$('resetEditor').onclick=resetEditor;
+$('mult').onchange=()=>{$('customWrap').hidden=$('mult').value!=='custom';calc()};
+['hp','customMult'].forEach(id=>$(id).oninput=calc);
+['rounds','wear','recovery'].forEach(id=>$(id).oninput=repairCalc);
+function repairCalc(){const wear=num($('rounds').value)/100*num($('wear').value),recovery=Math.max(.1,num($('recovery').value));$('wearTotal').textContent=fmt(wear)+'%';$('kits').textContent=String(Math.ceil(wear/recovery))}
+$('resetRepair').onclick=()=>{$('rounds').value=300;$('wear').value=5;$('recovery').value=25;repairCalc()};
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['calc','arsenal','repair'].forEach(id=>$(id).hidden=id!==b.dataset.tab)});
+$('export').onclick=()=>{const a=document.createElement('a'),blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});a.href=URL.createObjectURL(blob);a.download='chernarus-raid-data.json';a.click();URL.revokeObjectURL(a.href)};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d.arsenal)||!Array.isArray(d.loadout))throw Error();state=d;renderAll()}catch(err){alert('Не удалось импортировать JSON: неверный формат.')}e.target.value=''};
+$('building').onchange=()=>{};
+renderAll();repairCalc();
+})();
+</script>
+</body></html>
