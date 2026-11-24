@@ -7,13 +7,7 @@
   <meta name="theme-color" content="#080e0a">
   <title>CHERNARUS TALES — Тактическая карта</title>
 
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossorigin=""
-        onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'">
-
-  <style>
+<style>
     :root {
       --bg: #080e0a;
       --screen: #0b160e;
@@ -592,6 +586,20 @@
   
 /* Unified typography: compact interface and subdued helper text */
 html,body,button,input,select,textarea{font-family:"Courier New",monospace!important}
+
+/* Canvas map engine — no Leaflet dependency */
+#map{position:relative;overflow:hidden;touch-action:none;cursor:grab;background:#263329}
+#map:active{cursor:grabbing}
+#mapCanvas{display:block;width:100%;height:100%;touch-action:none}
+.map-zoom{position:absolute;right:12px;top:54px;display:flex;flex-direction:column;gap:5px;z-index:20}
+.map-zoom button{width:36px;min-height:34px;padding:3px;font-size:19px;background:#101d14eF;color:var(--green-bright);border-color:#426348}
+.map-popup{position:absolute;z-index:30;min-width:180px;max-width:min(260px,80vw);padding:12px;background:#101d14f5;border:1px solid #426348;box-shadow:0 5px 20px #000c;color:var(--text);font-size:11px;line-height:1.5;transform:translate(-50%,-100%);pointer-events:auto}
+.map-popup[hidden]{display:none}
+.map-popup .popup-title{color:var(--green-bright);font-weight:bold;margin-bottom:6px}
+.map-popup .small{margin-top:5px}
+.map-popup .popup-delete{margin-top:8px}
+@media(max-width:760px){.map-zoom{right:8px;top:46px}.map-zoom button{width:34px;min-height:34px}}
+
 </style>
 </head>
 
@@ -727,7 +735,7 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
     </aside>
 
     <div class="map-frame">
-      <div id="map" role="application" aria-label="Интерактивная карта Chernarus"></div>
+      <div id="map" role="application" aria-label="Интерактивная карта Chernarus"><canvas id="mapCanvas"></canvas><div id="mapPopup" class="map-popup" hidden></div><div class="map-zoom"><button id="zoomIn" type="button" aria-label="Приблизить">+</button><button id="zoomOut" type="button" aria-label="Отдалить">−</button><button id="resetView" type="button" aria-label="Показать всю карту">⌂</button></div></div>
 
       <div class="map-bottom">
         <div class="map-label">CHERNARUS // 0.9.4</div>
@@ -738,555 +746,205 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
   </div>
 </div>
 
-<script
-  src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-  crossorigin=""
-  onerror="this.onerror=null;this.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'">
-</script>
-
 <script>
 (() => {
-  // Public Chernarus tile set. Dimensions and filename pattern are defined
-  // in ScullyXlife/dayz-map-tiles-public/tiles-manifest.json (30 x 30).
+  "use strict";
   const TILE_BASE = "https://raw.githubusercontent.com/ScullyXlife/dayz-map-tiles-public/main/maps/chernarus/layers/";
   const TILE_FALLBACK = "https://cdn.jsdelivr.net/gh/ScullyXlife/dayz-map-tiles-public@main/maps/chernarus/layers/";
-
-  const TILE_SIZE = 512;
-  const TILE_COUNT = 30;
-  const WORLD = TILE_SIZE * TILE_COUNT;
+  const TILE_SIZE = 512, TILE_COUNT = 30, WORLD = TILE_SIZE * TILE_COUNT;
   const STORAGE_KEY = "dayz_chernarus_personal_marks_v1";
-  const tileCache = new Map();
-  let successfulTiles = 0;
-  let failedTiles = 0;
-  let pendingTiles = 0;
+  const mapEl = document.getElementById("map");
+  const canvas = document.getElementById("mapCanvas");
+  const ctx = canvas.getContext("2d");
+  const popup = document.getElementById("mapPopup");
+  const cache = new Map();
+  let width=1,height=1,dpr=1,scale=.02,minScale=.02,maxScale=.5;
+  let centerX=WORLD/2,centerY=WORLD/2,mode=null,drag=null;
+  let successful=0,failed=0,pending=0,marks=loadMarks();
+  let visibleTiles = new Set();
 
-  function fetchTileImage(url, timeoutMs = 12000) {
-    return new Promise(resolve => {
-      const img = new Image();
-      let settled = false;
-      const finish = value => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        img.onload = img.onerror = null;
-        resolve(value);
-      };
-      const timer = setTimeout(() => finish(null), timeoutMs);
-      img.onload = () => finish(img);
-      img.onerror = () => finish(null);
-      img.src = url;
+  function updateStatus(){
+    const el=document.getElementById("tileStatus");
+    if(!el)return;
+    if(pending)el.textContent="Загрузка карты: "+successful+" фрагм. · "+pending+" в очереди";
+    else if(successful && !failed)el.textContent="Карта загружена · фрагментов: "+successful;
+    else if(successful)el.textContent="Карта загружена частично · ошибок: "+failed;
+    else if(failed)el.textContent="Не удалось загрузить часть карты. Проверьте соединение.";
+    else el.textContent="Подготовка карты Черноруси…";
+  }
+  function loadImage(url,timeout){
+    return new Promise(resolve=>{
+      const img=new Image();let settled=false;
+      const finish=value=>{if(settled)return;settled=true;clearTimeout(timer);img.onload=img.onerror=null;resolve(value);};
+      const timer=setTimeout(()=>finish(null),timeout||11000);
+      img.onload=()=>finish(img);img.onerror=()=>finish(null);img.src=url;
     });
   }
-
-  function getTileImage(file) {
-    if (!tileCache.has(file)) {
-      const request = (async () => {
-        let image = await fetchTileImage(TILE_BASE + file);
-        if (!image) image = await fetchTileImage(TILE_FALLBACK + file);
-        if (image) successfulTiles++;
-        else failedTiles++;
-        updateTileStatus();
-        return image;
+  function getTile(x,y){
+    const key=x+"_"+y;
+    if(!cache.has(key)){
+      pending++;
+      const task=(async()=>{
+        let img=await loadImage(TILE_BASE+"S_"+String(x).padStart(3,"0")+"_"+String(y).padStart(3,"0")+"_lco.png");
+        if(!img)img=await loadImage(TILE_FALLBACK+"S_"+String(x).padStart(3,"0")+"_"+String(y).padStart(3,"0")+"_lco.png");
+        pending--;if(img)successful++;else failed++;updateStatus();requestRender();return img;
       })();
-      tileCache.set(file, request);
+      cache.set(key,task);
     }
-    return tileCache.get(file);
+    return cache.get(key);
   }
-
-  function updateTileStatus() {
-    const el = document.getElementById("tileStatus");
-    if (!el) return;
-    if (pendingTiles > 0) {
-      el.textContent = `Загрузка карты: ${successfulTiles} фрагм. загружено · ${pendingTiles} в очереди`;
-    } else if (successfulTiles > 0 && failedTiles === 0) {
-      el.textContent = `Карта загружена · фрагментов: ${successfulTiles}`;
-    } else if (successfulTiles > 0) {
-      el.textContent = `Карта загружена частично · ошибок: ${failedTiles}`;
-    } else if (failedTiles > 0) {
-      el.textContent = "Не удалось загрузить фрагменты карты. Проверьте соединение.";
-    }
+  function fitView(){
+    const rect=mapEl.getBoundingClientRect();
+    width=Math.max(1,rect.width);height=Math.max(1,rect.height);
+    scale=Math.min(width/WORLD,height/WORLD)*.94;
+    minScale=Math.max(.004,scale*.55);maxScale=Math.max(.5,scale*24);
+    centerX=WORLD/2;centerY=WORLD/2;hidePopup();resizeCanvas();render();
   }
-
-  const map = L.map("map", {
-    crs: L.CRS.Simple,
-    minZoom: -5,
-    maxZoom: 3,
-    zoomSnap: 0.25,
-    zoomDelta: 0.5,
-    maxBounds: [[0, 0], [WORLD, WORLD]],
-    maxBoundsViscosity: 0.85,
-    attributionControl: true
-  });
-
-  const ChernarusLayer = L.GridLayer.extend({
-
-    createTile(coords, done) {
-      const canvas = document.createElement("canvas");
-      canvas.width = canvas.height = TILE_SIZE;
-
-      const ctx = canvas.getContext("2d");
-      const z = Math.round(coords.z);
-
-      const loadSource = (sx, sy, draw) => {
-        if (sx < 0 || sx >= TILE_COUNT || sy < 0 || sy >= TILE_COUNT) {
-          draw(null);
-          return;
-        }
-        const file = `S_${String(sx).padStart(3,"0")}_${String(sy).padStart(3,"0")}_lco.png`;
-        pendingTiles++;
-        getTileImage(file).then(img => {
-          pendingTiles = Math.max(0, pendingTiles - 1);
-          draw(img);
-          updateTileStatus();
-        });
-      };
-
-      if (z <= 0) {
-        const factor = Math.pow(2, -z);
-        const gridCount = Math.ceil(TILE_COUNT / factor);
-
-        const topRow = coords.y + gridCount;
-        const sourceStartX = coords.x * factor;
-        const sourceStartY = topRow * factor;
-        const drawSize = TILE_SIZE / factor;
-
-        const jobs = [];
-
-        for (let dy = 0; dy < factor; dy++) {
-          for (let dx = 0; dx < factor; dx++) {
-            const sx = sourceStartX + dx;
-            const sy = sourceStartY + dy;
-
-            if (sx < TILE_COUNT && sy < TILE_COUNT) {
-              jobs.push({ sx, sy, dx, dy });
-            }
-          }
-        }
-
-        if (!jobs.length) {
-          done(null, canvas);
-          return canvas;
-        }
-
-        let pending = jobs.length;
-
-        jobs.forEach(job => {
-          loadSource(job.sx, job.sy, img => {
-            if (img) {
-              ctx.drawImage(
-                img,
-                job.dx * drawSize,
-                job.dy * drawSize,
-                drawSize,
-                drawSize
-              );
-            }
-
-            pending--;
-
-            if (pending === 0) {
-              done(null, canvas);
-            }
-          });
-        });
-
-      } else {
-        const factor = Math.pow(2, z);
-
-        const topPixelRow = coords.y + TILE_COUNT * factor;
-
-        const sx = Math.floor(coords.x / factor);
-        const sy = Math.floor(topPixelRow / factor);
-
-        const subX = ((coords.x % factor) + factor) % factor;
-        const subY = ((topPixelRow % factor) + factor) % factor;
-
-        const crop = TILE_SIZE / factor;
-
-        loadSource(sx, sy, img => {
-          if (img) {
-            ctx.drawImage(
-              img,
-              subX * crop,
-              subY * crop,
-              crop,
-              crop,
-              0,
-              0,
-              TILE_SIZE,
-              TILE_SIZE
-            );
-          } else {
-            ctx.fillStyle = "#343b32";
-            ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-          }
-
-          done(null, canvas);
-        });
+  function resizeCanvas(){
+    const rect=mapEl.getBoundingClientRect();
+    width=Math.max(1,rect.width);height=Math.max(1,rect.height);
+    dpr=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function worldToScreen(x,y){return {x:(x-centerX)*scale+width/2,y:(y-centerY)*scale+height/2};}
+  function screenToWorld(x,y){return {x:(x-width/2)/scale+centerX,y:(y-height/2)/scale+centerY};}
+  function requestRender(){if(!requestRender.queued){requestRender.queued=true;requestAnimationFrame(()=>{requestRender.queued=false;render();});}}
+  function render(){
+    if(!width||!height)return;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.fillStyle="#303a30";ctx.fillRect(0,0,width,height);
+    const left=centerX-width/(2*scale),top=centerY-height/(2*scale);
+    const right=centerX+width/(2*scale),bottom=centerY+height/(2*scale);
+    const x0=Math.max(0,Math.floor(left/TILE_SIZE)),x1=Math.min(TILE_COUNT-1,Math.floor(right/TILE_SIZE));
+    const y0=Math.max(0,Math.floor(top/TILE_SIZE)),y1=Math.min(TILE_COUNT-1,Math.floor(bottom/TILE_SIZE));
+    const current=new Set();
+    for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+      const key=x+"_"+y;current.add(key);
+      const px=(x*TILE_SIZE-centerX)*scale+width/2,py=(y*TILE_SIZE-centerY)*scale+height/2,size=TILE_SIZE*scale;
+      const img=cache.get(key);
+      if(img&&typeof img.then==="function"){
+        img.then(image=>{if(image)requestRender();});
+      }else if(img)ctx.drawImage(img,px,py,size,size);
+      else{
+        ctx.fillStyle="#354238";ctx.fillRect(px,py,size,size);
+        if(!cache.has(key))getTile(x,y);
       }
-
-      return canvas;
     }
-  });
-
-  const baseLayer = new ChernarusLayer({
-    tileSize: TILE_SIZE,
-    minZoom: -5,
-    maxZoom: 3,
-    noWrap: true,
-    keepBuffer: 1,
-    updateWhenZooming: false
-  }).addTo(map);
-
-  map.setView([WORLD / 2, WORLD / 2], -2);
-  // Recalculate Leaflet dimensions after the map's parent tab/iframe becomes visible.
-  const refreshMapSize = () => requestAnimationFrame(() => map.invalidateSize({ pan: false }));
-  window.addEventListener("resize", refreshMapSize);
-  window.addEventListener("message", event => {
-    if (event.data === "CT_MAP_VISIBLE") refreshMapSize();
-  });
-  if ("ResizeObserver" in window) new ResizeObserver(refreshMapSize).observe(document.getElementById("map"));
-  setTimeout(refreshMapSize, 250);
-  setTimeout(refreshMapSize, 900);
-
-  map.on("tileload", updateTileStatus);
-  map.on("tileerror", updateTileStatus);
-  updateTileStatus();
-
-  const layers = {
-    pin: L.layerGroup().addTo(map),
-    loot: L.layerGroup().addTo(map),
-    safe: L.layerGroup().addTo(map),
-    pvp: L.layerGroup().addTo(map)
-  };
-
-  let marks = loadMarks();
-  let mode = null;
-
-  function loadMarks() {
-    try {
-      const raw = JSON.parse(
-        localStorage.getItem(STORAGE_KEY) || "[]"
-      );
-
-      return Array.isArray(raw) ? raw : [];
-
-    } catch {
-      return [];
-    }
+    visibleTiles=current;
+    drawMarks();
+    ctx.strokeStyle="#8dbb91";ctx.lineWidth=1;ctx.strokeRect(0.5,0.5,width-1,height-1);
+    ctx.fillStyle="#d2e5d4";ctx.font="10px Courier New";ctx.textAlign="left";ctx.fillText("X: "+Math.round(centerX)+"  Z: "+Math.round(WORLD-centerY)+"  ZOOM: "+scale.toFixed(3),12,height-14);
   }
-
-  function saveMarks() {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(marks)
-    );
-
+  function colorFor(type){return {pin:"#a1e6a8",loot:"#d4b35e",safe:"#49bd72",pvp:"#d45b50"}[type]||"#a1e6a8";}
+  function drawMarks(){
+    marks.forEach(m=>{
+      const p=worldToScreen(Number(m.lng),WORLD-Number(m.lat));
+      if(m.type==="safe"||m.type==="pvp"){
+        const radius=Math.max(4,Number(m.radius||300)*scale),color=colorFor(m.type);
+        ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fillStyle=color+"26";ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();
+      }else{
+        const color=colorFor(m.type);
+        ctx.save();ctx.translate(p.x,p.y);ctx.shadowColor="#000";ctx.shadowBlur=5;
+        ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle="#efffef";ctx.lineWidth=1.5;ctx.stroke();
+        ctx.beginPath();ctx.arc(0,0,2.5,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();ctx.restore();
+      }
+    });
+  }
+  function loadMarks(){try{const raw=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");return Array.isArray(raw)?raw:[];}catch(e){return[];}}
+  function saveMarks(){localStorage.setItem(STORAGE_KEY,JSON.stringify(marks));render();document.getElementById("countStatus").textContent="Сохранено отметок: "+marks.length;}
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  function hidePopup(){popup.hidden=true;}
+  function showPopup(m,screen){
+    const detail=m.type==="loot"?"<div>"+esc(m.lootType||"Лут")+"</div>":"";
+    popup.innerHTML='<div class="popup-title">'+esc(m.name||"Без названия")+'</div>'+detail+
+      '<div class="small">X: '+Math.round(m.lng)+' · Z: '+Math.round(m.lat)+'</div>'+
+      '<button class="popup-delete" type="button" data-delete="'+esc(m.id)+'">Удалить отметку</button>';
+    popup.hidden=false;
+    popup.style.left=Math.max(110,Math.min(width-110,screen.x))+"px";
+    popup.style.top=Math.max(100,screen.y-10)+"px";
+    popup.querySelector("[data-delete]").addEventListener("click",()=>{marks=marks.filter(x=>String(x.id)!==String(m.id));hidePopup();saveMarks();});
+  }
+  function setMode(next){
+    mode=next;
+    document.querySelectorAll("#pinMode,#lootMode,#safeMode,#pvpMode").forEach(b=>b.classList.remove("active"));
+    const ids={pin:"pinMode",loot:"lootMode",safe:"safeMode",pvp:"pvpMode"};
+    if(next)document.getElementById(ids[next]).classList.add("active");
+    document.getElementById("modeStatus").textContent=next?"Режим включён: нажми на нужное место карты.":"Выбери тип отметки, затем нажми на карту.";
+  }
+  function setVisibility(){
+    const checks={pin:"showPins",loot:"showLoot",safe:"showSafe",pvp:"showPvp"};
+    marks=marks; // keep stored records; visibility is applied while drawing
+    const enabled={};Object.keys(checks).forEach(k=>enabled[k]=document.getElementById(checks[k]).checked);
+    drawMarks=function(){marks.forEach(m=>{
+      if(!enabled[m.type])return;
+      const p=worldToScreen(Number(m.lng),WORLD-Number(m.lat));
+      if(m.type==="safe"||m.type==="pvp"){const radius=Math.max(4,Number(m.radius||300)*scale),c=colorFor(m.type);ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fillStyle=c+"26";ctx.fill();ctx.strokeStyle=c;ctx.lineWidth=2;ctx.stroke();}
+      else{ctx.save();ctx.translate(p.x,p.y);ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fillStyle=colorFor(m.type);ctx.fill();ctx.strokeStyle="#efffef";ctx.lineWidth=1.5;ctx.stroke();ctx.restore();}
+    });};
     render();
   }
-
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, c => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[c]));
+  function nearestMark(point){
+    let best=null,bestDist=20;
+    for(const m of marks){if(!document.getElementById(({pin:"showPins",loot:"showLoot",safe:"showSafe",pvp:"showPvp"})[m.type]).checked)continue;
+      const p=worldToScreen(Number(m.lng),WORLD-Number(m.lat)),d=Math.hypot(p.x-point.x,p.y-point.y);
+      if(d<bestDist){best=m;bestDist=d;}
+    }return best;
   }
-
-  function colorFor(type) {
-    return {
-      pin: "#a1e6a8",
-      loot: "#d4b35e",
-      safe: "#49bd72",
-      pvp: "#d45b50"
-    }[type] || "#a1e6a8";
+  function addMark(point){
+    const world=screenToWorld(point.x,point.y);
+    const lootType=document.getElementById("lootType").value;
+    const defaults={pin:"Моя отметка",loot:lootType,safe:"Safe Zone",pvp:"PvP-зона"};
+    marks.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),type:mode,
+      name:document.getElementById("markerName").value.trim()||defaults[mode],
+      lootType:mode==="loot"?lootType:"",lat:WORLD-world.y,lng:world.x,
+      radius:Number(document.getElementById("zoneRadius").value)||300});
+    document.getElementById("markerName").value="";saveMarks();setMode(null);hidePopup();
   }
-
-  function iconFor(type) {
-    const color = colorFor(type);
-
-    return L.divIcon({
-      className: "",
-      html: `
-        <div class="custom-pin" style="background:${color}">
-          <i></i>
-        </div>
-      `,
-      iconSize: [26, 26],
-      iconAnchor: [13, 25],
-      popupAnchor: [0, -22]
-    });
-  }
-
-  function popupFor(m) {
-    const title = esc(m.name || "Без названия");
-
-    const detail = m.type === "loot"
-      ? `<div>${esc(m.lootType || "Лут")}</div>`
-      : "";
-
-    return `
-      <div class="popup-title">${title}</div>
-      ${detail}
-      <div class="small">
-        X: ${Math.round(m.lng)} · Z: ${Math.round(m.lat)}
-      </div>
-      <button
-        class="popup-delete"
-        onclick="window.deletePersonalMark('${m.id}')">
-        Удалить отметку
-      </button>
-    `;
-  }
-
-  window.deletePersonalMark = id => {
-    marks = marks.filter(m => m.id !== id);
-    saveMarks();
-  };
-
-  function render() {
-    Object.values(layers).forEach(layer => {
-      layer.clearLayers();
-    });
-
-    marks.forEach(m => {
-      const latlng = [m.lat, m.lng];
-
-      if (m.type === "safe" || m.type === "pvp") {
-        const circle = L.circle(latlng, {
-          radius: Number(m.radius || 300),
-          color: colorFor(m.type),
-          fillColor: colorFor(m.type),
-          fillOpacity: 0.18,
-          weight: 2
-        }).bindPopup(popupFor(m));
-
-        circle.addTo(layers[m.type]);
-
-      } else {
-        L.marker(latlng, {
-          icon: iconFor(m.type)
-        })
-          .bindPopup(popupFor(m))
-          .addTo(layers[m.type]);
-      }
-    });
-
-    setVisibility();
-
-    document.getElementById("countStatus").textContent =
-      `Сохранено отметок: ${marks.length}`;
-  }
-
-  function setVisibility() {
-    const checks = {
-      pin: "showPins",
-      loot: "showLoot",
-      safe: "showSafe",
-      pvp: "showPvp"
-    };
-
-    Object.entries(checks).forEach(([key, id]) => {
-      const box = document.getElementById(id);
-
-      if (box.checked && !map.hasLayer(layers[key])) {
-        map.addLayer(layers[key]);
-      }
-
-      if (!box.checked && map.hasLayer(layers[key])) {
-        map.removeLayer(layers[key]);
-      }
-    });
-  }
-
-  function setMode(next) {
-    mode = next;
-
-    document
-      .querySelectorAll("#pinMode,#lootMode,#safeMode,#pvpMode")
-      .forEach(b => b.classList.remove("active"));
-
-    const ids = {
-      pin: "pinMode",
-      loot: "lootMode",
-      safe: "safeMode",
-      pvp: "pvpMode"
-    };
-
-    if (next) {
-      document.getElementById(ids[next]).classList.add("active");
-    }
-
-    document.getElementById("modeStatus").textContent = next
-      ? "Режим включён: нажми на нужное место карты."
-      : "Выбери тип отметки, затем нажми на карту.";
-  }
-
-  document.getElementById("pinMode").onclick =
-    () => setMode("pin");
-
-  document.getElementById("lootMode").onclick =
-    () => setMode("loot");
-
-  document.getElementById("safeMode").onclick =
-    () => setMode("safe");
-
-  document.getElementById("pvpMode").onclick =
-    () => setMode("pvp");
-
-  document.getElementById("cancelMode").onclick =
-    () => setMode(null);
-
-  map.on("click", e => {
-    if (!mode) return;
-
-    const nameInput =
-      document.getElementById("markerName");
-
-    const lootType =
-      document.getElementById("lootType").value;
-
-    const defaults = {
-      pin: "Моя отметка",
-      loot: lootType,
-      safe: "Safe Zone",
-      pvp: "PvP-зона"
-    };
-
-    marks.push({
-      id: (
-        crypto.randomUUID
-          ? crypto.randomUUID()
-          : String(Date.now()) + Math.random()
-      ),
-
-      type: mode,
-
-      name:
-        nameInput.value.trim() || defaults[mode],
-
-      lootType:
-        mode === "loot" ? lootType : "",
-
-      lat: e.latlng.lat,
-      lng: e.latlng.lng,
-
-      radius:
-        Number(document.getElementById("zoneRadius").value) || 300
-    });
-
-    nameInput.value = "";
-
-    saveMarks();
-    setMode(null);
+  function localPoint(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+  canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY,cx:centerX,cy:centerY,moved:false,start:localPoint(e)};hidePopup();});
+  canvas.addEventListener("pointermove",e=>{if(!drag||drag.id!==e.pointerId)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4)drag.moved=true;centerX=drag.cx-dx/scale;centerY=drag.cy-dy/scale;requestRender();});
+  canvas.addEventListener("pointerup",e=>{
+    if(!drag||drag.id!==e.pointerId)return;
+    const wasMoved=drag.moved,point=localPoint(e);drag=null;
+    if(wasMoved)return;
+    const hit=nearestMark(point);if(hit){showPopup(hit,point);return;}
+    if(mode)addMark(point);
   });
-
-  [
-    "showPins",
-    "showLoot",
-    "showSafe",
-    "showPvp"
-  ].forEach(id => {
-    document
-      .getElementById(id)
-      .addEventListener("change", setVisibility);
-  });
-
-  /* Экспорт отметок */
-  document.getElementById("exportBtn").onclick = () => {
-    const blob = new Blob(
-      [JSON.stringify(marks, null, 2)],
-      { type: "application/json" }
-    );
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-
-    a.href = url;
-    a.download = "my-chernarus-markers.json";
-    a.click();
-
-    URL.revokeObjectURL(url);
+  canvas.addEventListener("pointercancel",()=>{drag=null;});
+  canvas.addEventListener("wheel",e=>{e.preventDefault();const p=localPoint(e),before=screenToWorld(p.x,p.y),factor=e.deltaY<0?1.18:1/1.18;scale=Math.max(minScale,Math.min(maxScale,scale*factor));const after=screenToWorld(p.x,p.y);centerX+=before.x-after.x;centerY+=before.y-after.y;requestRender();},{passive:false});
+  document.getElementById("zoomIn").onclick=()=>zoomAt(width/2,height/2,1.35);
+  document.getElementById("zoomOut").onclick=()=>zoomAt(width/2,height/2,1/1.35);
+  document.getElementById("resetView").onclick=fitView;
+  function zoomAt(x,y,f){const b=screenToWorld(x,y);scale=Math.max(minScale,Math.min(maxScale,scale*f));const a=screenToWorld(x,y);centerX+=b.x-a.x;centerY+=b.y-a.y;requestRender();}
+  document.getElementById("pinMode").onclick=()=>setMode("pin");
+  document.getElementById("lootMode").onclick=()=>setMode("loot");
+  document.getElementById("safeMode").onclick=()=>setMode("safe");
+  document.getElementById("pvpMode").onclick=()=>setMode("pvp");
+  document.getElementById("cancelMode").onclick=()=>setMode(null);
+  ["showPins","showLoot","showSafe","showPvp"].forEach(id=>document.getElementById(id).addEventListener("change",setVisibility));
+  document.getElementById("exportBtn").onclick=()=>{
+    const blob=new Blob([JSON.stringify(marks,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;a.download="my-chernarus-markers.json";a.click();URL.revokeObjectURL(url);
   };
-
-  /* Импорт отметок */
-  document.getElementById("importBtn").onclick = () => {
-    document.getElementById("importFile").click();
+  document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
+  document.getElementById("importFile").onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{const data=JSON.parse(await file.text());if(!Array.isArray(data))throw new Error("Файл должен содержать массив отметок");
+      const valid=data.filter(m=>m&&["pin","loot","safe","pvp"].includes(m.type)&&Number.isFinite(Number(m.lat))&&Number.isFinite(Number(m.lng)));
+      marks=marks.concat(valid.map(m=>({...m,id:String(m.id||Date.now()+Math.random())})));saveMarks();alert("Импортировано отметок: "+valid.length);
+    }catch(err){alert("Не удалось импортировать файл: "+err.message);}e.target.value="";
   };
-
-  document.getElementById("importFile").onchange = async e => {
-    const file = e.target.files[0];
-
-    if (!file) return;
-
-    try {
-      const data = JSON.parse(await file.text());
-
-      if (!Array.isArray(data)) {
-        throw new Error(
-          "Файл должен содержать массив отметок"
-        );
-      }
-
-      const valid = data.filter(m =>
-        m &&
-        ["pin", "loot", "safe", "pvp"].includes(m.type) &&
-        Number.isFinite(Number(m.lat)) &&
-        Number.isFinite(Number(m.lng))
-      );
-
-      marks = [
-        ...marks,
-        ...valid.map(m => ({
-          ...m,
-          id: String(m.id || Date.now() + Math.random())
-        }))
-      ];
-
-      saveMarks();
-
-      alert(`Импортировано отметок: ${valid.length}`);
-
-    } catch(err) {
-      alert("Не удалось импортировать файл: " + err.message);
-    }
-
-    e.target.value = "";
+  document.getElementById("clearBtn").onclick=()=>{
+    if(confirm("Удалить все личные отметки из этого браузера?")){marks=[];hidePopup();saveMarks();}
   };
-
-  /* Очистка отметок */
-  document.getElementById("clearBtn").onclick = () => {
-    if (
-      confirm(
-        "Удалить все личные отметки из этого браузера?"
-      )
-    ) {
-      marks = [];
-      saveMarks();
-    }
-  };
-
-  /* Мобильное меню */
-  document.getElementById("menuBtn").onclick = () => {
-    document
-      .getElementById("sidebar")
-      .classList.toggle("open");
-  };
-
-  /* Закрывать меню после выбора места на мобильном */
-  map.on("click", () => {
-    if (window.innerWidth <= 760 && mode) {
-      document
-        .getElementById("sidebar")
-        .classList.remove("open");
-    }
-  });
-
-  render();
-
+  document.getElementById("menuBtn").onclick=()=>document.getElementById("sidebar").classList.toggle("open");
+  function refresh(){resizeCanvas();requestRender();}
+  window.addEventListener("resize",refresh);
+  window.addEventListener("message",e=>{if(e.data==="CT_MAP_VISIBLE")refresh();});
+  if("ResizeObserver"in window)new ResizeObserver(refresh).observe(mapEl);
+  document.getElementById("countStatus").textContent="Сохранено отметок: "+marks.length;
+  fitView();setVisibility();updateStatus();
 })();
 </script>
 <script src="language.js"></script>
