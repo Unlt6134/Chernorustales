@@ -810,6 +810,25 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
 @media(max-width:620px){.phrase-list{grid-template-columns:1fr}.phrase-category{font-size:11px;padding:8px 10px}.phrase-card{padding:12px}.phrase-card .phrase-main{font-size:14px}}
 
 .phrase-card .phrase-phonetic{font-size:12px;line-height:1.45;color:#d5c58b;margin-top:5px;letter-spacing:.2px}
+
+/* Expanded bilingual archive files */
+.archive-files{display:grid;grid-template-columns:1fr;gap:14px;margin:0 0 30px}
+.archive-file{border:1px solid var(--border);border-left:3px solid var(--green);padding:18px 20px;background:linear-gradient(105deg,rgba(18,34,21,.82),rgba(7,14,9,.92))}
+.archive-file-tag{font-size:9px;letter-spacing:2px;color:var(--green);opacity:.72;margin-bottom:9px}
+.archive-file h3{font-size:19px;line-height:1.25;margin:0 0 12px;color:var(--bright)}
+.archive-file p,.archive-file li{font-size:12px;line-height:1.55;color:var(--muted);margin:0 0 9px}
+.archive-file ul{margin:0;padding-left:18px}
+.archive-file li{padding-left:3px;margin-bottom:7px}
+.archive-file .archive-note{border-left:2px solid var(--green);padding:8px 11px;margin-top:12px;background:rgba(60,110,65,.08);font-size:11px}
+.archive-sources{display:flex;flex-wrap:wrap;align-items:center;gap:9px 15px;margin:0 0 28px;padding:12px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:10px}
+.archive-sources span{color:var(--muted);letter-spacing:1px}
+.archive-sources a{color:var(--green);text-decoration:none}
+.archive-sources a:hover{text-decoration:underline}
+.terminal-box{line-height:1.55}
+.terminal-box br{display:none}
+.terminal-box{display:flex;flex-direction:column;gap:12px}
+.terminal-box strong{display:inline}
+@media(min-width:900px){.archive-files{grid-template-columns:repeat(2,minmax(0,1fr))}.archive-file{padding:22px}}
 </style>
 <style>
       .ct-lang-toggle{display:inline-block!important;position:relative;z-index:20;margin:14px auto 4px;padding:8px 20px;min-width:64px;border:1px solid #78c982;border-radius:3px;background:#102016;color:#c2ffc2;font:700 13px Consolas,monospace;letter-spacing:1px;cursor:pointer;box-shadow:0 0 14px rgba(107,210,118,.18)}
@@ -943,6 +962,58 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
               </p>
             </article>
 
+          </div>
+
+          <h2 class="section-heading" data-ru="Полевые материалы" data-en="FIELD INTELLIGENCE">Полевые материалы</h2>
+          <p class="section-description" data-ru="Расширенные досье архива: история региона, практические основы выживания, ориентиры на карте и сведения о событиях после катастрофы." data-en="Expanded archive files: regional history, practical survival basics, map landmarks and information about events after the collapse.">Расширенные досье архива: история региона, практические основы выживания, ориентиры на карте и сведения о событиях после катастрофы.</p>
+
+          <div class="archive-files">
+            <article class="archive-file">
+              <div class="archive-file-tag">FILE_001 // HISTORY</div>
+              <h3 data-ru="История Черноруси" data-en="HISTORY OF CHERNARUS">История Черноруси</h3>
+              <p data-ru="Чернорусь — вымышленная постсоветская республика в мире Arma и DayZ. Игровая область Южная Загория пережила гражданский конфликт 2009 года. В нём участвовали правительственные силы CDF, движение ChDKZ и националистическая группировка NAPA; позднее в конфликт вмешались иностранные силы." data-en="Chernarus is a fictional post-Soviet republic in the Arma and DayZ universe. The in-game region of South Zagoria experienced a civil conflict in 2009 involving government CDF forces, the ChDKZ movement and the NAPA nationalist group; foreign forces later intervened.">Чернорусь — вымышленная постсоветская республика в мире Arma и DayZ. Игровая область Южная Загория пережила гражданский конфликт 2009 года. В нём участвовали правительственные силы CDF, движение ChDKZ и националистическая группировка NAPA; позднее в конфликт вмешались иностранные силы.</p>
+              <p data-ru="После распада СССР республика стала независимой. На карте остались следы советской индустриализации: железные дороги, порты, электростанции, плотины и крупные промышленные объекты. Эти детали объясняют, почему побережье выглядит более индустриальным, а внутренние районы — сельскими и лесистыми." data-en="After the dissolution of the USSR, the republic became independent. The map retains traces of Soviet-era industrialization: railways, ports, power stations, dams and large industrial sites. This helps explain the industrial coast and the rural, forested inland.">После распада СССР республика стала независимой. На карте остались следы советской индустриализации: железные дороги, порты, электростанции, плотины и крупные промышленные объекты. Эти детали объясняют, почему побережье выглядит более индустриальным, а внутренние районы — сельскими и лесистыми.</p>
+              <p data-ru="Точная причина и момент начала заражения официально не раскрыты. Версии о лаборатории, конкретном вирусе или виновной стороне — догадки игроков, а не подтверждённый канон." data-en="The exact cause and start of the outbreak have not been officially revealed. Theories about a laboratory, a specific virus or a responsible faction are player speculation, not confirmed canon.">Точная причина и момент начала заражения официально не раскрыты. Версии о лаборатории, конкретном вирусе или виновной стороне — догадки игроков, а не подтверждённый канон.</p>
+            </article>
+
+            <article class="archive-file">
+              <div class="archive-file-tag">FILE_002 // SURVIVAL</div>
+              <h3 data-ru="Выживание: первые задачи" data-en="SURVIVAL: FIRST PRIORITIES">Выживание: первые задачи</h3>
+              <ul>
+                <li data-ru="Вода важнее лишнего снаряжения. Найди колодец или безопасный источник, следи за жаждой и не пей из сомнительных ёмкостей без обработки." data-en="Water matters more than extra gear. Find a well or a safe source, watch your thirst and treat questionable water before drinking.">Вода важнее лишнего снаряжения. Найди колодец или безопасный источник, следи за жаждой и не пей из сомнительных ёмкостей без обработки.</li>
+                <li data-ru="Еда поддерживает энергию. Проверяй состояние продуктов, не переедай за один раз и пополняй запас постепенно." data-en="Food sustains your energy. Check its condition, avoid eating too much at once and replenish your supply steadily.">Еда поддерживает энергию. Проверяй состояние продуктов, не переедай за один раз и пополняй запас постепенно.</li>
+                <li data-ru="Холод и сырость опасны: надевай сухую одежду, укрывайся от дождя и не задерживайся в воде." data-en="Cold and wet clothing are dangerous: wear dry layers, shelter from rain and avoid staying in water.">Холод и сырость опасны: надевай сухую одежду, укрывайся от дождя и не задерживайся в воде.</li>
+                <li data-ru="Следи за кровотечением и инфекциями. Держи при себе чистые бинты или тряпки, лекарства и запасной способ остановить кровь." data-en="Watch for bleeding and infections. Carry clean bandages or rags, medicine and a backup way to stop bleeding.">Следи за кровотечением и инфекциями. Держи при себе чистые бинты или тряпки, лекарства и запасной способ остановить кровь.</li>
+                <li data-ru="Не вступай в каждый бой. Заражённые и выстрелы привлекают внимание; иногда безопаснее обойти угрозу." data-en="Do not fight every threat. Infected and gunshots draw attention; going around danger is often safer.">Не вступай в каждый бой. Заражённые и выстрелы привлекают внимание; иногда безопаснее обойти угрозу.</li>
+              </ul>
+              <p class="archive-note" data-ru="Совет: перед дальним выходом проверь воду, еду, тепло, бинты, свободное место и маршрут отхода." data-en="Field tip: before a long trip, check water, food, warmth, bandages, free inventory space and an escape route.">Совет: перед дальним выходом проверь воду, еду, тепло, бинты, свободное место и маршрут отхода.</p>
+            </article>
+
+            <article class="archive-file">
+              <div class="archive-file-tag">FILE_003 // LOCATIONS</div>
+              <h3 data-ru="Опасные места и ориентиры" data-en="DANGEROUS AREAS & LANDMARKS">Опасные места и ориентиры</h3>
+              <p data-ru="Северо-западный аэродром (NWAF) — крупный военный комплекс с ценным снаряжением. Открытые полосы и длинные линии обзора делают перемещение заметным; проверяй ангары и периметр, прежде чем пересекать открытое пространство." data-en="Northwest Airfield (NWAF) is a large military complex with valuable gear. Its open runways and long sightlines make movement exposed; check hangars and the perimeter before crossing open ground.">Северо-западный аэродром (NWAF) — крупный военный комплекс с ценным снаряжением. Открытые полосы и длинные линии обзора делают перемещение заметным; проверяй ангары и периметр, прежде чем пересекать открытое пространство.</p>
+              <p data-ru="Тисы и Каменск — удалённые военные районы. Путь туда требует запаса еды, воды, одежды и медикаментов; на подходах и внутри объектов возможны другие игроки." data-en="Tisy and Kamensk are remote military areas. Reaching them requires spare food, water, clothing and medical supplies; other players may be near the approaches or inside the compounds.">Тисы и Каменск — удалённые военные районы. Путь туда требует запаса еды, воды, одежды и медикаментов; на подходах и внутри объектов возможны другие игроки.</p>
+              <p data-ru="Рифы и Павлово — постоянные заражённые зоны. Для входа нужна подходящая NBC-защита и фильтр; проверяй состояние экипировки и заранее планируй выход." data-en="Rify and Pavlovo are permanent contaminated areas. Entry requires suitable NBC protection and a filter; check your gear condition and plan your exit in advance.">Рифы и Павлово — постоянные заражённые зоны. Для входа нужна подходящая NBC-защита и фильтр; проверяй состояние экипировки и заранее планируй выход.</p>
+              <p data-ru="Города у побережья удобны для начального поиска еды, одежды и базовых инструментов, но часто становятся местом встреч игроков. Используй задние дворы, лесные кромки и укрытия." data-en="Coastal towns are useful for finding starter food, clothing and basic tools, but are common player encounter areas. Use backyards, tree lines and cover.">Города у побережья удобны для начального поиска еды, одежды и базовых инструментов, но часто становятся местом встреч игроков. Используй задние дворы, лесные кромки и укрытия.</p>
+            </article>
+
+            <article class="archive-file">
+              <div class="archive-file-tag">FILE_004 // CLASSIFIED</div>
+              <h3 data-ru="Секретные материалы: что известно" data-en="CLASSIFIED FILES: WHAT IS KNOWN">Секретные материалы: что известно</h3>
+              <p data-ru="Военные колонны, разбитая техника, блокпосты и следы эвакуации показывают, что попытки сдержать катастрофу предпринимались. Но найденные обломки не раскрывают полной последовательности событий." data-en="Military convoys, wrecked vehicles, checkpoints and traces of evacuation show that attempts were made to contain the disaster. The wreckage does not reveal the full sequence of events.">Военные колонны, разбитая техника, блокпосты и следы эвакуации показывают, что попытки сдержать катастрофу предпринимались. Но найденные обломки не раскрывают полной последовательности событий.</p>
+              <p data-ru="Вертолётные крушения и военные конвои — динамические события: место их появления меняется. Услышав стрельбу или заметив дым, не спеши бежать к источнику — сначала оцени обстановку." data-en="Helicopter crashes and military convoys are dynamic events: their locations can change. If you hear gunfire or spot smoke, do not rush toward it — assess the area first.">Вертолётные крушения и военные конвои — динамические события: место их появления меняется. Услышав стрельбу или заметив дым, не спеши бежать к источнику — сначала оцени обстановку.</p>
+              <p data-ru="Токсичные отходы, заражённые корабли и военные объекты — подсказки об усилиях по локализации угрозы. Однако связь каждой находки с причиной заражения не подтверждена." data-en="Toxic-waste markings, contaminated shipwrecks and military sites hint at containment efforts. However, the connection between each clue and the cause of the outbreak is unconfirmed.">Токсичные отходы, заражённые корабли и военные объекты — подсказки об усилиях по локализации угрозы. Однако связь каждой находки с причиной заражения не подтверждена.</p>
+              <p class="archive-note" data-ru="Пометка архива: отделяй игровые факты от теорий сообщества. История заражения намеренно оставлена неоднозначной." data-en="Archive note: separate in-game facts from community theories. The outbreak story is intentionally left ambiguous.">Пометка архива: отделяй игровые факты от теорий сообщества. История заражения намеренно оставлена неоднозначной.</p>
+            </article>
+          </div>
+
+          <div class="archive-sources">
+            <span data-ru="МАТЕРИАЛЫ ДЛЯ СВЕРКИ:" data-en="REFERENCE MATERIAL:">МАТЕРИАЛЫ ДЛЯ СВЕРКИ:</span>
+            <a href="https://dayz.wiki.gg/wiki/Republic_of_Chernarus" target="_blank" rel="noopener">Chernarus history</a>
+            <a href="https://dayz.wiki.gg/wiki/Lore" target="_blank" rel="noopener">DayZ lore</a>
+            <a href="https://dayz.wiki.gg/wiki/Maps" target="_blank" rel="noopener">Official maps</a>
+            <a href="https://wobo.tools/dayz-map-tool?map=chernarus" target="_blank" rel="noopener">WOBO Chernarus map</a>
           </div>
 
           <h2 class="section-heading">Сообщение системы</h2>
@@ -1197,5 +1268,21 @@ document.addEventListener('DOMContentLoaded',render);render();
 </script>
 
 <script src="language.js"></script>
+
+<script>
+(()=>{
+function updateArchiveLanguage(){
+ const lang=localStorage.getItem('ct_language')==='en'?'en':'ru';
+ document.querySelectorAll('#home [data-ru][data-en]').forEach(el=>{
+  const value=el.getAttribute('data-'+lang);
+  if(value!==null)el.textContent=value;
+ });
+}
+window.addEventListener('ct-language-change',updateArchiveLanguage);
+document.addEventListener('DOMContentLoaded',updateArchiveLanguage);
+updateArchiveLanguage();
+})();
+</script>
+
 </body>
 </html>
