@@ -94,4 +94,5 @@ $('resetChecks').onclick=()=>{state.checks={};save();renderChecks()};
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['calculator','reference','checklist'].forEach(id=>$(id).hidden=id!==b.dataset.tab)});
 fillTargets();fillAttack();renderTables();renderChecks();renderPlan();updateTarget();
 })();
-</script></body></html>
+</script><script src="language.js"></script>
+</body></html>
