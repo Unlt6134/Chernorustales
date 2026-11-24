@@ -1,733 +1,1175 @@
+HTML
 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#07100a">
-  <title>CHERNARUS TALES — Survival Archive</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080e09">
+<meta name="description" content="CHERNARUS TALES — архив выжившего, тактическая карта и база знаний DayZ.">
+<title>CHERNARUS TALES — Military Archive</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --bg: #050906;
-      --panel: #0a130c;
-      --panel-light: #101c12;
-      --green: #78c879;
-      --green-bright: #a5f59a;
-      --green-dark: #315c36;
-      --text: #c2d3c0;
-      --muted: #718672;
-      --border: #29432c;
-      --red: #b85c4c;
-      --yellow: #c5a85a;
-    }
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #050805;
+  --screen: #09110b;
+  --panel: #0d180f;
+  --panel2: #111f14;
+  --green: #83c987;
+  --bright: #b6f5a9;
+  --dark: #365c3b;
+  --text: #c2d0c0;
+  --muted: #718273;
+  --border: rgba(126, 190, 128, .25);
+  --glow: rgba(126, 220, 132, .16);
+  --red: #bd6859;
+  --yellow: #c7aa61;
+}
 
-    * {
-      box-sizing: border-box;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    html {
-      scroll-behavior: smooth;
-    }
+html {
+  scroll-behavior: smooth;
+}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 50% 0%, #142419 0%, transparent 60%),
-        var(--bg);
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
-      overflow-x: hidden;
-    }
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 28px 18px;
+  background:
+    radial-gradient(ellipse at 50% 0%, #1b2b1d 0%, transparent 55%),
+    linear-gradient(140deg, #0a100b, #030503 75%);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  overflow-x: hidden;
+}
 
-    /* CRT-эффект */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1000;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        rgba(0, 0, 0, 0.12) 1px,
-        transparent 3px
-      );
-      opacity: 0.35;
-    }
+button {
+  font: inherit;
+}
 
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 999;
-      background: radial-gradient(
-        ellipse at center,
-        transparent 45%,
-        rgba(0, 0, 0, 0.48) 100%
-      );
-    }
+/* Фоновая атмосфера */
 
-    button {
-      font-family: inherit;
-    }
+.background-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .13;
+  background-image:
+    linear-gradient(rgba(117,180,120,.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(117,180,120,.12) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
 
-    .container {
-      width: min(1180px, calc(100% - 32px));
-      margin: auto;
-    }
+/* Корпус ноутбука */
 
-    /* Верхняя панель */
-    header {
-      position: relative;
-      padding: 42px 20px 28px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-      background: rgba(4, 10, 6, 0.88);
-      box-shadow: 0 8px 35px rgba(0, 0, 0, 0.45);
-    }
+.laptop {
+  width: min(1250px, 100%);
+  margin: auto;
+  padding: 13px 13px 18px;
+  border: 1px solid #38453a;
+  border-radius: 17px 17px 10px 10px;
+  background: linear-gradient(145deg, #303830, #141a15 35%, #252c25);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.75),
+    0 5px 15px rgba(0,0,0,.6),
+    inset 0 1px 1px rgba(255,255,255,.12);
+  animation: laptopAppear .8s ease both;
+}
 
-    .system-label {
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 4px;
-      margin-bottom: 12px;
-    }
+@keyframes laptopAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
-    h1 {
-      margin: 0;
-      color: var(--green-bright);
-      font-family: 'Oswald', sans-serif;
-      font-size: clamp(38px, 7vw, 76px);
-      font-weight: 600;
-      letter-spacing: 7px;
-      text-shadow:
-        0 0 8px rgba(120, 200, 121, 0.65),
-        0 0 25px rgba(120, 200, 121, 0.25);
-    }
+.laptop-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  height: 19px;
+  color: #879087;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
 
-    .subtitle {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 3px;
-    }
+.camera {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #111;
+  border: 1px solid #697069;
+  box-shadow: 0 0 5px rgba(100,180,110,.3);
+}
 
-    .header-decoration {
-      position: absolute;
-      top: 18px;
-      left: 20px;
-      color: var(--green-dark);
-      font-size: 11px;
-    }
+/* Экран */
 
-    .header-version {
-      position: absolute;
-      top: 18px;
-      right: 20px;
-      color: var(--green-dark);
-      font-size: 11px;
-    }
+.screen {
+  position: relative;
+  min-height: 600px;
+  overflow: hidden;
+  border: 2px solid #111812;
+  border-radius: 5px;
+  background: var(--screen);
+  box-shadow:
+    inset 0 0 35px rgba(0,0,0,.8),
+    0 0 22px rgba(104,180,108,.08);
+}
 
-    /* Строка состояния */
-    .status-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 12px 18px;
-      margin: 20px auto;
-      border: 1px solid var(--border);
-      background: rgba(10, 19, 12, 0.9);
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 1px;
-    }
+/* CRT-полосы */
 
-    .status-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+.screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: .13;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0,0,0,.45) 1px,
+    transparent 3px
+  );
+}
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 9px var(--green);
-      display: inline-block;
-    }
+.screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 49;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0,0,0,.35) 100%
+  );
+}
 
-    /* Навигация */
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      margin: 28px auto;
-    }
+/* Верхняя системная панель */
 
-    .nav-button {
-      position: relative;
-      padding: 13px 19px;
-      border: 1px solid var(--border);
-      background: #09120b;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: 0.2s;
-      clip-path: polygon(
-        0 0,
-        calc(100% - 10px) 0,
-        100% 10px,
-        100% 100%,
-        10px 100%,
-        0 calc(100% - 10px)
-      );
-    }
+.system-top {
+  min-height: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 15px;
+  background: #101a12;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
 
-    .nav-button:hover {
-      color: var(--green-bright);
-      border-color: var(--green);
-      background: #122017;
-      box-shadow: 0 0 15px rgba(120, 200, 121, 0.12);
-    }
+.system-left,
+.system-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-    .nav-button.active {
-      color: var(--green-bright);
-      background: #17291a;
-      border-color: var(--green);
-      box-shadow:
-        inset 0 0 15px rgba(120, 200, 121, 0.08),
-        0 0 12px rgba(120, 200, 121, 0.12);
-    }
+.system-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: ledBlink 2.5s infinite;
+}
 
-    /* Основные секции */
-    main {
-      padding-bottom: 50px;
-    }
+@keyframes ledBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
 
-    .tab-content {
-      display: none;
-      animation: appear 0.3s ease;
-    }
+/* Заголовок */
 
-    .tab-content.active {
-      display: block;
-    }
+header {
+  position: relative;
+  padding: 40px 20px 33px;
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(24,44,27,.65), rgba(7,15,9,.95));
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
 
-    @keyframes appear {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+header::before {
+  content: "";
+  position: absolute;
+  left: -30%;
+  top: 0;
+  width: 25%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(150,255,150,.06), transparent);
+  transform: skewX(-20deg);
+  animation: lightSweep 8s ease-in-out infinite;
+}
 
-    .section-heading {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 35px 0 18px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-      color: var(--green-bright);
-      font-family: 'Oswald', sans-serif;
-      font-size: 24px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
+@keyframes lightSweep {
+  0%, 65% { left: -30%; }
+  100% { left: 130%; }
+}
 
-    .section-heading::before {
-      content: ">";
-      color: var(--green);
-      font-family: 'Share Tech Mono', monospace;
-    }
+.header-decoration {
+  position: absolute;
+  top: 13px;
+  left: 17px;
+  color: var(--dark);
+  font-size: 9px;
+}
 
-    .section-description {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-      margin-bottom: 25px;
-    }
+.header-version {
+  position: absolute;
+  top: 13px;
+  right: 17px;
+  color: var(--dark);
+  font-size: 9px;
+}
 
-    /* Карточки */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 14px;
-    }
+.system-label {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 5px;
+}
 
-    .info-card {
-      position: relative;
-      padding: 20px;
-      min-height: 145px;
-      border: 1px solid var(--border);
-      background: linear-gradient(145deg, #101b12, #080e09);
-      transition: 0.25s;
-    }
+h1 {
+  margin: 0;
+  color: var(--bright);
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(36px, 6vw, 75px);
+  font-weight: 600;
+  letter-spacing: 7px;
+  text-shadow:
+    0 0 8px rgba(140,230,140,.5),
+    0 0 25px rgba(100,200,110,.22);
+  animation: titlePulse 4s ease-in-out infinite alternate;
+}
 
-    .info-card:hover {
-      border-color: var(--green);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
-    }
+@keyframes titlePulse {
+  from { text-shadow: 0 0 8px rgba(140,230,140,.25); }
+  to { text-shadow: 0 0 22px rgba(140,230,140,.7); }
+}
 
-    .card-code {
-      color: var(--green-dark);
-      font-size: 10px;
-      letter-spacing: 2px;
-      margin-bottom: 13px;
-    }
+.subtitle {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 3px;
+}
 
-    .info-card h3 {
-      margin: 0 0 10px;
-      color: var(--green-bright);
-      font-family: 'Oswald', sans-serif;
-      font-size: 19px;
-      font-weight: 500;
-      letter-spacing: 1px;
-    }
+/* Основной интерфейс */
 
-    .info-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.7;
-    }
+.container {
+  width: min(1050px, calc(100% - 32px));
+  margin: auto;
+}
 
-    /* Карта */
-    .map-frame {
-      width: 100%;
-      height: min(75vh, 760px);
-      min-height: 450px;
-      border: 1px solid var(--green-dark);
-      background: #030604;
-      box-shadow:
-        0 0 25px rgba(0, 0, 0, 0.6),
-        inset 0 0 20px rgba(0, 0, 0, 0.5);
-    }
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 12px 15px;
+  background: rgba(12,23,14,.9);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
 
-    .map-frame iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: #030604;
-    }
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-    .map-note {
-      padding: 12px 15px;
-      border: 1px solid var(--border);
-      border-top: none;
-      background: #09120b;
-      color: var(--muted);
-      font-size: 11px;
-    }
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 9px var(--green);
+}
 
-    /* Текстовые блоки */
-    .terminal-box {
-      padding: 22px;
-      border: 1px solid var(--border);
-      background: rgba(8, 16, 10, 0.92);
-      line-height: 1.8;
-      font-size: 13px;
-      white-space: pre-line;
-    }
+/* Навигация */
 
-    .terminal-box strong {
-      color: var(--green-bright);
-      font-weight: normal;
-    }
+nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin: 25px 0 32px;
+}
 
-    .terminal-line {
-      color: var(--green);
-    }
+.nav-button {
+  min-height: 49px;
+  padding: 12px 8px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: linear-gradient(145deg, #111e13, #09110b);
+  font-size: 11px;
+  letter-spacing: .7px;
+  cursor: pointer;
+  transition:
+    color .2s ease,
+    background .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  );
+}
 
-    /* Нижняя часть */
-    footer {
-      padding: 25px 15px;
-      text-align: center;
-      border-top: 1px solid var(--border);
-      background: #050a06;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.8;
-      letter-spacing: 1px;
-    }
+.nav-button:hover {
+  color: var(--bright);
+  border-color: var(--green);
+  background: #18291b;
+  box-shadow: 0 0 14px var(--glow);
+  transform: translateY(-2px);
+}
 
-    footer span {
-      color: var(--green);
-    }
+.nav-button.active {
+  color: var(--bright);
+  border-color: var(--green);
+  background: linear-gradient(145deg, #1b3020, #102016);
+  box-shadow:
+    inset 0 0 15px rgba(130,210,130,.08),
+    0 0 12px rgba(130,210,130,.12);
+}
 
-    /* Адаптация для телефона */
-    @media (max-width: 600px) {
-      header {
-        padding: 50px 12px 25px;
-      }
+/* Разделы */
 
-      h1 {
-        letter-spacing: 3px;
-      }
+main {
+  padding-bottom: 45px;
+}
 
-      .header-decoration,
-      .header-version {
-        font-size: 9px;
-      }
+.tab-content {
+  display: none;
+}
 
-      .container {
-        width: calc(100% - 20px);
-      }
+.tab-content.active {
+  display: block;
+  animation: sectionIn .35s ease both;
+}
 
-      nav {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-      }
+@keyframes sectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-      .nav-button {
-        padding: 13px 7px;
-        font-size: 10px;
-      }
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 32px 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--bright);
+  font-family: 'Oswald', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
 
-      .status-bar {
-        font-size: 10px;
-      }
+.section-heading::before {
+  content: ">";
+  color: var(--green);
+  font-family: monospace;
+}
 
-      .map-frame {
-        height: 65vh;
-        min-height: 380px;
-      }
+.section-description {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.9;
+}
 
-      .section-heading {
-        font-size: 21px;
-      }
-    }
-  </style>
+/* Горизонтальные карточки */
+
+.card-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  min-height: 118px;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  background: linear-gradient(100deg, #142319, #0b140d 65%);
+  overflow: hidden;
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease,
+    background .25s ease;
+  animation: cardIn .45s ease both;
+}
+
+.info-card:nth-child(2) { animation-delay: .07s; }
+.info-card:nth-child(3) { animation-delay: .14s; }
+.info-card:nth-child(4) { animation-delay: .21s; }
+.info-card:nth-child(5) { animation-delay: .28s; }
+.info-card:nth-child(6) { animation-delay: .35s; }
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.info-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--dark);
+  transition: .25s;
+}
+
+.info-card:hover {
+  transform: translateX(4px);
+  border-color: rgba(150,225,150,.65);
+  background: linear-gradient(100deg, #1b3020, #0d190f 65%);
+  box-shadow: 0 6px 24px rgba(0,0,0,.28);
+}
+
+.info-card:hover::before {
+  background: var(--bright);
+  box-shadow: 0 0 12px var(--green);
+}
+
+.card-info {
+  padding-right: 20px;
+  border-right: 1px solid var(--border);
+}
+
+.card-code {
+  margin-bottom: 9px;
+  color: var(--dark);
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+.info-card h3 {
+  margin: 0;
+  color: var(--green-bright);
+  font-family: 'Oswald', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.info-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+/* Терминальное сообщение */
+
+.terminal-box {
+  padding: 22px;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgba(18,34,21,.9), rgba(7,14,9,.96));
+  box-shadow: inset 0 0 25px rgba(100,180,100,.035);
+  font-size: 12px;
+  line-height: 2;
+  white-space: pre-line;
+}
+
+.terminal-box strong {
+  color: var(--bright);
+  font-weight: normal;
+}
+
+.terminal-line {
+  color: var(--green);
+}
+
+/* Окно карты */
+
+.map-shell {
+  border: 1px solid rgba(130,200,130,.42);
+  padding: 7px;
+  background: #050a06;
+  box-shadow:
+    0 0 24px rgba(0,0,0,.5),
+    inset 0 0 20px rgba(0,0,0,.5);
+}
+
+.map-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 13px;
+  background: #132017;
+  border-bottom: 1px solid var(--border);
+  color: var(--green);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.map-frame {
+  width: 100%;
+  height: min(75vh, 760px);
+  min-height: 430px;
+  background: #030604;
+}
+
+.map-frame iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #030604;
+}
+
+.map-bottom {
+  padding: 11px 13px;
+  border-top: 1px solid var(--border);
+  background: #0b140d;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+/* Подвал */
+
+footer {
+  padding: 24px 15px;
+  text-align: center;
+  background: #080e09;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 2;
+  letter-spacing: 1px;
+}
+
+footer span {
+  color: var(--green);
+}
+
+/* Нижняя часть корпуса */
+
+.laptop-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  height: 22px;
+  color: #747d74;
+  font-size: 8px;
+  letter-spacing: 3px;
+}
+
+.laptop-bottom::before,
+.laptop-bottom::after {
+  content: "";
+  width: 35px;
+  height: 2px;
+  border-radius: 5px;
+  background: #4c554d;
+}
+
+/* Планшеты */
+
+@media (max-width: 800px) {
+  body {
+    padding: 14px 10px;
+  }
+
+  .laptop {
+    padding: 9px 9px 13px;
+    border-radius: 12px;
+  }
+
+  .container {
+    width: calc(100% - 24px);
+  }
+
+  .info-card {
+    grid-template-columns: 175px minmax(0, 1fr);
+    gap: 15px;
+    padding: 17px;
+  }
+
+  .status-bar {
+    justify-content: flex-start;
+  }
+}
+
+/* Телефоны */
+
+@media (max-width: 560px) {
+  body {
+    padding: 0;
+    background: #050805;
+  }
+
+  .laptop {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--screen);
+  }
+
+  .laptop-top,
+  .laptop-bottom {
+    display: none;
+  }
+
+  .screen {
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .container {
+    width: calc(100% - 22px);
+  }
+
+  header {
+    padding: 48px 10px 28px;
+  }
+
+  h1 {
+    font-size: clamp(34px, 10vw, 48px);
+    letter-spacing: 3px;
+  }
+
+  .system-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    font-size: 9px;
+    letter-spacing: 2px;
+  }
+
+  .header-decoration,
+  .header-version {
+    top: 12px;
+    font-size: 8px;
+  }
+
+  .header-decoration { left: 10px; }
+  .header-version { right: 10px; }
+
+  .system-top {
+    font-size: 8px;
+    padding: 8px 10px;
+  }
+
+  .system-right {
+    display: none;
+  }
+
+  .status-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px;
+    padding: 12px 10px;
+    font-size: 9px;
+  }
+
+  nav {
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin: 20px 0 27px;
+  }
+
+  .nav-button {
+    min-height: 45px;
+    padding: 10px 5px;
+    font-size: 9px;
+  }
+
+  .section-heading {
+    margin-top: 27px;
+    font-size: 21px;
+  }
+
+  .section-description {
+    font-size: 11px;
+  }
+
+  .info-card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-height: 0;
+    padding: 16px 17px;
+  }
+
+  .card-info {
+    padding: 0 0 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .info-card h3 {
+    font-size: 20px;
+  }
+
+  .info-card p {
+    font-size: 11px;
+    line-height: 1.8;
+  }
+
+  .map-frame {
+    height: 65vh;
+    min-height: 380px;
+  }
+
+  .map-topbar {
+    font-size: 8px;
+  }
+
+  .terminal-box {
+    padding: 15px;
+    font-size: 11px;
+  }
+
+  footer {
+    font-size: 9px;
+  }
+}
+
+/* Отключение лишней анимации для слабых устройств
+   и пользователей с настройкой уменьшения движения */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <div class="header-decoration">MILITARY NETWORK // CHERNARUS</div>
-    <div class="header-version">BUILD 0.9.4</div>
+<div class="background-grid"></div>
 
-    <div class="system-label">SURVIVAL INFORMATION DATABASE</div>
-    <h1>CHERNARUS TALES</h1>
-    <div class="subtitle">ARCHIVE OF THE COLLAPSED WORLD</div>
-  </header>
+<div class="laptop">
 
-  <div class="container">
+  <div class="laptop-top">
+    <span class="camera"></span>
+    CHERNARUS MILITARY TERMINAL
+  </div>
 
-    <div class="status-bar">
-      <div class="status-item">
-        <span class="status-dot"></span>
-        SYSTEM ONLINE
+  <div class="screen">
+
+    <div class="system-top">
+      <div class="system-left">
+        <span class="system-led"></span>
+        <span>CT_OS // SYSTEM READY</span>
       </div>
-      <div class="status-item">LOCATION: CHERNARUS</div>
-      <div class="status-item">NETWORK: UNSTABLE</div>
-      <div class="status-item" id="clock">TIME: --:--:--</div>
+
+      <div class="system-right">
+        <span>SECURE CONNECTION</span>
+        <span>BUILD 1.2.0</span>
+      </div>
     </div>
 
-    <nav>
-      <button class="nav-button active" onclick="openTab('home', this)">
-        ▣ КОМИКСЫ И ФАКТЫ
-      </button>
+    <header>
+      <div class="header-decoration">MILITARY NETWORK // CHERNARUS</div>
+      <div class="header-version">ARCHIVE 01.24</div>
 
-      <button class="nav-button" onclick="openTab('map', this)">
-        ⌖ НАВИГАТОР
-      </button>
+      <div class="system-label">SURVIVAL INFORMATION DATABASE</div>
+      <h1>CHERNARUS TALES</h1>
+      <div class="subtitle">ARCHIVE OF THE COLLAPSED WORLD</div>
+    </header>
 
-      <button class="nav-button" onclick="openTab('dictionary', this)">
-        ▤ РАЗГОВОРНИК
-      </button>
+    <div class="container">
 
-      <button class="nav-button" onclick="openTab('raid', this)">
-        ◈ ШПАРГАЛКА РЕЙДА
-      </button>
-    </nav>
-
-    <main>
-
-      <!-- ГЛАВНАЯ -->
-      <section id="home" class="tab-content active">
-
-        <h2 class="section-heading">Архив Черноруси</h2>
-
-        <p class="section-description">
-          Добро пожаловать в информационную сеть выживших.
-          Здесь собраны материалы, заметки, истории и сведения,
-          которые могут помочь тебе пережить ещё один день.
-        </p>
-
-        <div class="card-grid">
-
-          <article class="info-card">
-            <div class="card-code">FILE_001 // HISTORY</div>
-            <h3>История Черноруси</h3>
-            <p>
-              Архив событий, загадки заражения и информация
-              о мире после начала катастрофы.
-            </p>
-          </article>
-
-          <article class="info-card">
-            <div class="card-code">FILE_002 // SURVIVAL</div>
-            <h3>Выживание</h3>
-            <p>
-              Полезные сведения о поиске припасов,
-              передвижении и выживании в опасных районах.
-            </p>
-          </article>
-
-          <article class="info-card">
-            <div class="card-code">FILE_003 // LOCATIONS</div>
-            <h3>Опасные места</h3>
-            <p>
-              Военные объекты, заражённые территории,
-              заброшенные поселения и тайники.
-            </p>
-          </article>
-
-          <article class="info-card">
-            <div class="card-code">FILE_004 // CLASSIFIED</div>
-            <h3>Секретные материалы</h3>
-            <p>
-              Неизвестные события, странные находки
-              и информация, которую лучше не игнорировать.
-            </p>
-          </article>
-
+      <div class="status-bar">
+        <div class="status-item">
+          <span class="status-dot"></span>
+          SYSTEM ONLINE
         </div>
+        <div class="status-item">LOCATION: CHERNARUS</div>
+        <div class="status-item">NETWORK: UNSTABLE</div>
+        <div class="status-item" id="clock">TIME: --:--:--</div>
+      </div>
 
-        <h2 class="section-heading">Сообщение системы</h2>
+      <nav>
+        <button class="nav-button active" onclick="openTab('home', this)">
+          ▣ КОМИКСЫ И ФАКТЫ
+        </button>
 
-        <div class="terminal-box">
-          <div class="terminal-line">> CONNECTION ESTABLISHED</div>
-          <br>
-          Система архива запущена.
-          <br>
-          Доступ к информационным разделам открыт.
-          <br>
-          <br>
-          <strong>ПОМНИ:</strong> доверять можно не каждому.
-          Запасы ограничены. Любой выстрел может привлечь внимание.
-          <br>
-          <br>
-          <span class="terminal-line">> GOOD LUCK, SURVIVOR.</span>
-        </div>
+        <button class="nav-button" onclick="openTab('map', this)">
+          ⌖ НАВИГАТОР
+        </button>
 
-      </section>
+        <button class="nav-button" onclick="openTab('dictionary', this)">
+          ▤ РАЗГОВОРНИК
+        </button>
 
-      <!-- КАРТА -->
-      <section id="map" class="tab-content">
+        <button class="nav-button" onclick="openTab('raid', this)">
+          ◈ ШПАРГАЛКА РЕЙДА
+        </button>
+      </nav>
 
-        <h2 class="section-heading">Тактический навигатор</h2>
+      <main>
 
-        <p class="section-description">
-          Интерактивная карта Черноруси.
-          Используй её для планирования маршрутов,
-          поиска локаций и отметок важных мест.
-        </p>
+        <!-- ГЛАВНАЯ -->
 
-        <div class="map-frame">
-          <iframe
-            src="map.html"
-            title="Тактическая карта Черноруси"
-            loading="lazy"
-            allowfullscreen>
-          </iframe>
-        </div>
+        <section id="home" class="tab-content active">
 
-        <div class="map-note">
-          MAP SYSTEM // CHERNARUS TERRITORY // PERSONAL NAVIGATION
-        </div>
+          <h2 class="section-heading">Архив Черноруси</h2>
 
-      </section>
+          <p class="section-description">
+            Добро пожаловать в информационную сеть выживших.
+            Здесь собраны материалы, заметки, истории и сведения,
+            которые могут помочь тебе пережить ещё один день.
+          </p>
 
-      <!-- РАЗГОВОРНИК -->
-      <section id="dictionary" class="tab-content">
+          <div class="card-grid">
 
-        <h2 class="section-heading">Разговорник выжившего</h2>
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">FILE_001 // HISTORY</div>
+                <h3>История Черноруси</h3>
+              </div>
+              <p>
+                Архив событий, загадки заражения и информация
+                о мире после начала катастрофы.
+              </p>
+            </article>
 
-        <p class="section-description">
-          Основные термины и выражения, которые можно встретить
-          в общении между выжившими.
-        </p>
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">FILE_002 // SURVIVAL</div>
+                <h3>Выживание</h3>
+              </div>
+              <p>
+                Полезные сведения о поиске припасов,
+                передвижении и выживании в опасных районах.
+              </p>
+            </article>
 
-        <div class="card-grid">
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">FILE_003 // LOCATIONS</div>
+                <h3>Опасные места</h3>
+              </div>
+              <p>
+                Военные объекты, заражённые территории,
+                заброшенные поселения и тайники.
+              </p>
+            </article>
 
-          <article class="info-card">
-            <div class="card-code">TERM_001</div>
-            <h3>KOS</h3>
-            <p>Kill On Sight — убивать при встрече, без переговоров.</p>
-          </article>
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">FILE_004 // CLASSIFIED</div>
+                <h3>Секретные материалы</h3>
+              </div>
+              <p>
+                Неизвестные события, странные находки
+                и информация, которую лучше не игнорировать.
+              </p>
+            </article>
 
-          <article class="info-card">
-            <div class="card-code">TERM_002</div>
-            <h3>Friendly?</h3>
-            <p>Вопрос о намерениях встреченного игрока.</p>
-          </article>
+          </div>
 
-          <article class="info-card">
-            <div class="card-code">TERM_003</div>
-            <h3>Loot</h3>
-            <p>Предметы, оружие, еда и другие полезные вещи.</p>
-          </article>
+          <h2 class="section-heading">Сообщение системы</h2>
 
-          <article class="info-card">
-            <div class="card-code">TERM_004</div>
-            <h3>Freshie</h3>
-            <p>Новый игрок, который только появился на побережье.</p>
-          </article>
+          <div class="terminal-box">
+            <div class="terminal-line">> CONNECTION ESTABLISHED</div>
+            <br>
+            Система архива запущена.
+            <br>
+            Доступ к информационным разделам открыт.
+            <br><br>
+            <strong>ПОМНИ:</strong> доверять можно не каждому.
+            Запасы ограничены. Любой выстрел может привлечь внимание.
+            <br><br>
+            <span class="terminal-line">> GOOD LUCK, SURVIVOR.</span>
+          </div>
 
-          <article class="info-card">
-            <div class="card-code">TERM_005</div>
-            <h3>Geared</h3>
-            <p>Игрок с хорошим снаряжением и оружием.</p>
-          </article>
+        </section>
 
-          <article class="info-card">
-            <div class="card-code">TERM_006</div>
-            <h3>Base</h3>
-            <p>База или укреплённое убежище игроков.</p>
-          </article>
+        <!-- КАРТА -->
 
-        </div>
+        <section id="map" class="tab-content">
 
-      </section>
+          <h2 class="section-heading">Тактический навигатор</h2>
 
-      <!-- ШПАРГАЛКА -->
-      <section id="raid" class="tab-content">
+          <p class="section-description">
+            Интерактивная карта Черноруси.
+            Используй её для планирования маршрутов,
+            поиска локаций и отметок важных мест.
+          </p>
 
-        <h2 class="section-heading">Шпаргалка рейда</h2>
+          <div class="map-shell">
 
-        <p class="section-description">
-          Краткий список вещей, которые стоит проверить
-          перед выходом на опасную территорию.
-        </p>
+            <div class="map-topbar">
+              <span>TACTICAL MAP // CHERNARUS</span>
+              <span><span class="system-led"></span> MAP SYSTEM ACTIVE</span>
+            </div>
 
-        <div class="terminal-box">
-          <strong>[01] СНАРЯЖЕНИЕ</strong>
-          <br>
-          □ Оружие и боеприпасы
-          <br>
-          □ Запасной магазин
-          <br>
-          □ Нож или инструмент
-          <br>
-          □ Средства защиты
-          <br>
-          <br>
+            <div class="map-frame">
+              <iframe
+                src="map.html"
+                title="Тактическая карта Черноруси"
+                loading="lazy"
+                allowfullscreen>
+              </iframe>
+            </div>
 
-          <strong>[02] МЕДИЦИНА</strong>
-          <br>
-          □ Бинты или тряпки
-          <br>
-          □ Таблетки
-          <br>
-          □ Антисептик
-          <br>
-          □ Запас крови или аптечка
-          <br>
-          <br>
+            <div class="map-bottom">
+              PERSONAL NAVIGATION SYSTEM // TERRITORY DATABASE
+            </div>
 
-          <strong>[03] ВЫЖИВАНИЕ</strong>
-          <br>
-          □ Вода
-          <br>
-          □ Еда
-          <br>
-          □ Тёплая одежда
-          <br>
-          □ Фонарь и батарейки
-          <br>
-          <br>
+          </div>
 
-          <strong>[04] ПЕРЕД ВЫХОДОМ</strong>
-          <br>
-          □ Проверить маршрут
-          <br>
-          □ Проверить состояние экипировки
-          <br>
-          □ Убедиться, что есть свободное место
-          <br>
-          □ Оценить риски
-          <br>
-          <br>
+        </section>
 
-          <span class="terminal-line">> CHECK COMPLETE. READY FOR DEPLOYMENT.</span>
-        </div>
+        <!-- РАЗГОВОРНИК -->
 
-      </section>
+        <section id="dictionary" class="tab-content">
 
-    </main>
+          <h2 class="section-heading">Разговорник выжившего</h2>
+
+          <p class="section-description">
+            Основные термины и выражения,
+            которые можно встретить в общении между выжившими.
+          </p>
+
+          <div class="card-grid">
+
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">TERM_001</div>
+                <h3>KOS</h3>
+              </div>
+              <p>Kill On Sight — убивать при встрече, без переговоров.</p>
+            </article>
+
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">TERM_002</div>
+                <h3>Friendly?</h3>
+              </div>
+              <p>Вопрос о намерениях встреченного игрока.</p>
+            </article>
+
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">TERM_003</div>
+                <h3>Loot</h3>
+              </div>
+              <p>Предметы, оружие, еда и другие полезные вещи.</p>
+            </article>
+
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">TERM_004</div>
+                <h3>Freshie</h3>
+              </div>
+              <p>Новый игрок, который только появился на побережье.</p>
+            </article>
+
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">TERM_005</div>
+                <h3>Geared</h3>
+              </div>
+              <p>Игрок с хорошим снаряжением и оружием.</p>
+            </article>
+
+            <article class="info-card">
+              <div class="card-info">
+                <div class="card-code">TERM_006</div>
+                <h3>Base</h3>
+              </div>
+              <p>База или укреплённое убежище игроков.</p>
+            </article>
+
+          </div>
+
+        </section>
+
+        <!-- ШПАРГАЛКА -->
+
+        <section id="raid" class="tab-content">
+
+          <h2 class="section-heading">Шпаргалка рейда</h2>
+
+          <p class="section-description">
+            Краткий список вещей, которые стоит проверить
+            перед выходом на опасную территорию.
+          </p>
+
+          <div class="terminal-box">
+            <strong>[01] СНАРЯЖЕНИЕ</strong>
+            <br>
+            □ Оружие и боеприпасы
+            <br>
+            □ Запасной магазин
+            <br>
+            □ Нож или инструмент
+            <br>
+            □ Средства защиты
+            <br><br>
+
+            <strong>[02] МЕДИЦИНА</strong>
+            <br>
+            □ Бинты или тряпки
+            <br>
+            □ Таблетки
+            <br>
+            □ Антисептик
+            <br>
+            □ Запас крови или аптечка
+            <br><br>
+
+            <strong>[03] ВЫЖИВАНИЕ</strong>
+            <br>
+            □ Вода
+            <br>
+            □ Еда
+            <br>
+            □ Тёплая одежда
+            <br>
+            □ Фонарь и батарейки
+            <br><br>
+
+            <strong>[04] ПЕРЕД ВЫХОДОМ</strong>
+            <br>
+            □ Проверить маршрут
+            <br>
+            □ Проверить состояние экипировки
+            <br>
+            □ Убедиться, что есть свободное место
+            <br>
+            □ Оценить риски
+            <br><br>
+
+            <span class="terminal-line">> CHECK COMPLETE. READY FOR DEPLOYMENT.</span>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+    <footer>
+      CHERNARUS TALES // SURVIVAL ARCHIVE
+      <br>
+      <span>NO ONE IS COMING TO SAVE YOU.</span>
+      <br><br>
+      UNOFFICIAL DAYZ FAN PROJECT
+    </footer>
 
   </div>
 
-  <footer>
-    CHERNARUS TALES // SURVIVAL ARCHIVE
-    <br>
-    <span>NO ONE IS COMING TO SAVE YOU.</span>
-    <br>
-    <br>
-    UNOFFICIAL DAYZ FAN PROJECT
-  </footer>
+  <div class="laptop-bottom">
+    MILITARY FIELD COMPUTER
+  </div>
 
-  <script>
-    function openTab(tabId, button) {
-      document.querySelectorAll('.tab-content').forEach(section => {
-        section.classList.remove('active');
-      });
+</div>
 
-      document.querySelectorAll('.nav-button').forEach(btn => {
-        btn.classList.remove('active');
-      });
+<script>
+/* Переключение вкладок */
 
-      const selectedSection = document.getElementById(tabId);
+function openTab(tabId, button) {
+  const sections = document.querySelectorAll('.tab-content');
+  const buttons = document.querySelectorAll('.nav-button');
 
-      if (selectedSection) {
-        selectedSection.classList.add('active');
-      }
+  sections.forEach(section => {
+    section.classList.remove('active');
+  });
 
-      if (button) {
-        button.classList.add('active');
-      }
+  buttons.forEach(btn => {
+    btn.classList.remove('active');
+  });
 
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
+  const selected = document.getElementById(tabId);
 
-    function updateClock() {
-      const now = new Date();
+  if (selected) {
+    selected.classList.add('active');
+  }
 
-      const time = now.toLocaleTimeString('ru-RU', {
-        hour12: false,
-        timeZone: 'Europe/Berlin'
-      });
+  if (button) {
+    button.classList.add('active');
+  }
 
-      const clock = document.getElementById('clock');
+  window.scrollTo({
+    top: 0,
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth'
+  });
+}
 
-      if (clock) {
-        clock.textContent = 'TIME: ' + time;
-      }
-    }
+/* Часы */
 
-    updateClock();
-    setInterval(updateClock, 1000);
-  </script>
+function updateClock() {
+  const clock = document.getElementById('clock');
+
+  if (!clock) return;
+
+  const time = new Date().toLocaleTimeString('ru-RU', {
+    hour12: false
+  });
+
+  clock.textContent = 'TIME: ' + time;
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+</script>
 
 </body>
 </html>
