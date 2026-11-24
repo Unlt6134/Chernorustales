@@ -239,12 +239,41 @@ const KEY='ct_language', words={
 'Часть watchtower.':'Watchtower component.',
 'Пули наносят крайне малый урон.':'Bullets deal very little damage.',
 'Непосредственно не повреждается; разрушай обе рамы.':'Not directly damageable; destroy both frames.'
+,' единиц':' units',
+' (разные типы предметов не суммируются в общий ресурс).':' (different item types are not combined into one resource).',
+'СПРАВОЧНИК // ДАННЫЕ ВАНИЛЬНОЙ КОНФИГУРАЦИИ':'REFERENCE // VANILLA CONFIG DATA',
+'ВЗРЫВЧАТКА':'EXPLOSIVES',
+'БОЕПРИПАСЫ':'AMMUNITION',
+'ПОДГОТОВКА К РЕЙДУ // СНАРЯЖЕНИЕ':'PRE-RAID // EQUIPMENT',
+'ПОДГОТОВКА К РЕЙДУ // МЕДИЦИНА':'PRE-RAID // MEDICAL',
+'ПРОВЕРКА ГРУППЫ // ФИНАЛ':'SQUAD CHECK // FINAL',
+'ЧЕРНОРУСЬ // РЕЙД':'CHERNARUS // RAID',
+'СИСТЕМА РЕЙДА АКТИВНА':'RAID SYSTEM ACTIVE',
+'ГЛАВНЫЙ ТЕРМИНАЛ':'MAIN TERMINAL',
+'УРОН ПО ВАНИЛЬНОЙ МОДЕЛИ // ИНСТРУМЕНТ ПО КОНФИГУРАЦИИ':'VANILLA DAMAGE MODEL // CONFIG-AWARE FIELD TOOL',
+'АРХИВ ЧЕРНОРУСИ // ОПЕРАЦИИ РЕЙДА':'CHERNARUS TALES // RAID OPERATIONS',
+'НАБОР ДАННЫХ: DAYZ 1.30.164078.38 // ЛИЧНЫЙ СПИСОК':'DATASET: DAYZ 1.30.164078.38 // LOCAL CHECKLIST',
+'СПРАВОЧНИК УРОНА VANILLA // СПИСОК ПЕРЕД РЕЙДОМ':'VANILLA DAMAGE REFERENCE // PRE-RAID CHECKLIST',
+'РАЗДЕЛ РЕЙДА':'RAID SECTION',
+'ОПЕРАЦИИ РЕЙДА // ЧЕРНОРУСЬ':'RAID OPERATIONS // CHERNARUS',
+'Система рейда активна':'Raid system active',
+'NO ONE IS COMING TO SAVE YOU.':'НИКТО НЕ ПРИДЁТ ТЕБЯ СПАСАТЬ.',
+'UNOFFICIAL DAYZ FAN PROJECT':'НЕОФИЦИАЛЬНЫЙ ФАН-ПРОЕКТ DAYZ',
+'TIME: ':'ВРЕМЯ: '
 };
 const ruToEn=Object.entries(words).sort((a,b)=>b[0].length-a[0].length);
 const enToRu=Object.entries(words).map(([a,b])=>[b,a]).sort((a,b)=>b[0].length-a[0].length);
 function translateText(text,lang){let out=text;for(const [from,to] of (lang==='en'?ruToEn:enToRu)){out=out.split(from).join(to)}return out}
 const originals=new WeakMap();
-function translateNode(node,lang){if(!originals.has(node))originals.set(node,node.nodeValue);node.nodeValue=translateText(originals.get(node),lang)}
+function translateNode(node,lang){
+ if(!node||node.nodeType!==Node.TEXT_NODE)return;
+ let record=originals.get(node);
+ if(!record){record={original:node.nodeValue,last:node.nodeValue};originals.set(node,record)}
+ else if(node.nodeValue!==record.last){record.original=node.nodeValue}
+ const translated=translateText(record.original,lang);
+ if(node.nodeValue!==translated){node.nodeValue=translated}
+ record.last=translated;
+}
 function translateTree(root,lang){
  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;
  while(node=walker.nextNode())translateNode(node,lang);
@@ -266,8 +295,14 @@ if(b){
 }
 apply(localStorage.getItem(KEY)||'ru');
 window.addEventListener('storage',e=>{if(e.key===KEY)apply(e.newValue||'ru')});
-const observer=new MutationObserver(records=>{const lang=localStorage.getItem(KEY)||'ru';for(const rec of records){rec.addedNodes.forEach(n=>{if(n.nodeType===Node.TEXT_NODE)translateNode(n,lang);else if(n.nodeType===Node.ELEMENT_NODE)translateTree(n,lang)})}});
-observer.observe(document.body,{subtree:true,childList:true});
+const observer=new MutationObserver(records=>{
+ const lang=localStorage.getItem(KEY)||'ru';
+ for(const rec of records){
+  if(rec.type==='characterData')translateNode(rec.target,lang);
+  rec.addedNodes.forEach(n=>{if(n.nodeType===Node.TEXT_NODE)translateNode(n,lang);else if(n.nodeType===Node.ELEMENT_NODE)translateTree(n,lang)});
+ }
+});
+observer.observe(document.body,{subtree:true,childList:true,characterData:true});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
