@@ -315,7 +315,7 @@ h1 {
 
 nav {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
   margin: 25px 0 32px;
 }
@@ -857,6 +857,10 @@ footer span {
         <button class="nav-button" onclick="openTab('raid', this)">
           ◈ ШПАРГАЛКА РЕЙДА
         </button>
+
+        <button class="nav-button" onclick="openTab('raidcalc', this)">
+          ⚒ КАЛЬКУЛЯТОР РЕЙДА
+        </button>
       </nav>
 
       <main>
@@ -1096,6 +1100,36 @@ footer span {
             <br><br>
 
             <span class="terminal-line">> CHECK COMPLETE. READY FOR DEPLOYMENT.</span>
+          </div>
+
+        </section>
+
+        <section id="raidcalc" class="tab-content">
+
+          <h2 class="section-heading">Калькулятор рейда</h2>
+
+          <p class="section-description">
+            Расчёт по настраиваемым значениям HP и урона.
+            Встроенные цифры не выдаются за официальные данные игры.
+          </p>
+
+          <div class="map-shell">
+            <div class="map-topbar">
+              <span>RAID CALCULATOR // CHERNARUS</span>
+              <span><span class="system-led"></span> ENGINEERING SYSTEM ACTIVE</span>
+            </div>
+
+            <div class="map-frame">
+              <iframe
+                src="raid.html"
+                title="Калькулятор рейда DayZ"
+                loading="lazy">
+              </iframe>
+            </div>
+
+            <div class="map-bottom">
+              CONFIGURABLE DAMAGE MODEL // LOCAL PROFILE
+            </div>
           </div>
 
         </section>
