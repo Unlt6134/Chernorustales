@@ -1181,7 +1181,8 @@ function updateClock() {
     hour12: false
   });
 
-  clock.textContent = 'TIME: ' + time;
+  const lang = localStorage.getItem('ct_language') === 'en' ? 'en' : 'ru';
+  clock.textContent = (lang === 'en' ? 'TIME: ' : 'ВРЕМЯ: ') + time;
 }
 
 updateClock();
