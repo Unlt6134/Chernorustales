@@ -55,23 +55,19 @@ input,select{font-size:12px;padding:8px}table{font-size:11px}
 </style></head><body><div class="shell">
 <header><div><div class="brand">CHERNARUS TALES // RAID</div><div class="sub">VANILLA DAMAGE MODEL // CONFIG-AWARE FIELD TOOL</div></div><a href="index.html">← ГЛАВНЫЙ ТЕРМИНАЛ</a></header>
 <main>
-<div class="notice"><b>ТОЧНОСТЬ ДАННЫХ.</b> Встроенная база рассчитана по игровым конфигам DayZ 1.30.164078.38 (источник ZIPANG). Взрывчатка предполагается установленной вплотную и наносящей полный урон; пули — на близкой дистанции. На расстоянии урон взрыва падает. Серверные моды и конфиги могут менять результат; <code>disableBaseDamage=1</code> отключает урон по заборам и вышкам. Используй профиль «Свой сервер», если настройки отличаются.</div>
 <div class="tabs"><button class="active" data-tab="calculator">КАЛЬКУЛЯТОР</button><button data-tab="reference">СПРАВОЧНИК</button><button data-tab="checklist">ПОДГОТОВКА</button></div>
 <section id="calculator">
-<div class="notice"><b>КАК ПОЛЬЗОВАТЬСЯ:</b> 1) выбери часть базы; 2) укажи количество; 3) выбери средство. Калькулятор даёт оценку по встроенным параметрам — серверные моды и расстояние до взрыва меняют результат.</div>
 <div class="grid">
 <div class="panel full">
 <div class="kicker">ШАГ 1 ИЗ 3</div><h2>ЧТО НУЖНО РАЗРУШИТЬ?</h2>
 <div class="row"><div><label for="target">Выбери часть постройки</label><select id="target"></select></div><div><label for="targetCount">Сколько таких частей?</label><input id="targetCount" type="number" min="1" max="100" value="1"></div></div>
 <div class="row"><div><label for="serverMode">Настройки сервера</label><select id="serverMode"><option value="vanilla">Обычная DayZ (база 1.30)</option><option value="custom">Мои настройки сервера</option></select></div><div class="metrics" style="margin-top:0"><div class="metric"><small>HP ОДНОЙ ЧАСТИ</small><strong id="hpEach">—</strong></div><div class="metric"><small>ВСЕГО HP</small><strong id="hpTotal">—</strong></div></div></div>
 <div id="customTarget" hidden class="row"><div><label for="customHp">HP одной части</label><input id="customHp" type="number" min="1" value="16000"></div><div><label for="customExplosive">Множитель взрыва</label><input id="customExplosive" type="number" min="0" step=".01" value="53"></div><div><label for="customBullet">Множитель пуль</label><input id="customBullet" type="number" min="0" step=".01" value="1"></div></div>
-<div class="muted" id="targetNote"></div>
 </div>
 <div class="panel full">
 <div class="kicker">ШАГ 2 ИЗ 3</div><h2>ЧЕМ БУДЕШЬ РЕЙДИТЬ?</h2>
 <div class="row"><div><label for="attackType">Тип средства</label><select id="attackType"><option value="explosive">Взрывчатка</option><option value="bullet">Боеприпасы</option><option value="custom">Свой урон / мод</option></select></div><div><label for="weapon">Выбери предмет</label><select id="weapon"></select></div></div>
 <div class="row"><div><label for="rawDamage">Урон за единицу</label><input id="rawDamage" type="number" min="0" step=".1"></div><div><label for="quantity">Сколько единиц у тебя есть?</label><input id="quantity" type="number" min="0" value="1"></div></div>
-<div class="muted">Можно изменить урон вручную, если на сервере установлены другие значения.</div>
 </div>
 <div class="panel full">
 <div class="kicker">ШАГ 3 ИЗ 3</div><h2>РЕЗУЛЬТАТ РАСЧЁТА</h2>
@@ -82,28 +78,28 @@ input,select{font-size:12px;padding:8px}table{font-size:11px}
 </div>
 </div></section>
 <section id="reference" hidden><div class="grid">
-<div class="panel full"><div class="kicker">REFERENCE // VANILLA CONFIG DATA</div><h2>ПРОЧНОСТЬ И МНОЖИТЕЛИ ЧАСТЕЙ</h2><div class="table-scroll"><table><thead><tr><th>ЧАСТЬ</th><th>HP</th><th>ВЗРЫВ</th><th>ПУЛИ</th></tr></thead><tbody id="targetTable"></tbody></table></div><div class="source">Источник: анализ конфигов DayZ 1.30.164078.38; данные частей забора и вышки. <a href="https://dayz.zipang.games/en/mechanics/raid/" target="_blank" rel="noopener">ZIPANG — Raiding bases</a>.</div></div>
-<div class="panel"><div class="kicker">EXPLOSIVES</div><h2>УРОН ВЗРЫВЧАТКИ</h2><table><thead><tr><th>ПРЕДМЕТ</th><th>БАЗОВЫЙ УРОН</th></tr></thead><tbody id="explosiveTable"></tbody></table><div class="source">Урон одного взрыва из конфигов версии 1.30. Дальность и падение урона зависят от расстояния до цели.</div></div>
-<div class="panel"><div class="kicker">AMMUNITION</div><h2>УРОН БОЕПРИПАСОВ</h2><table><thead><tr><th>КАЛИБР / ТИП</th><th>УРОН</th></tr></thead><tbody id="ammoTable"></tbody></table><div class="source">Значения базового урона боеприпасов из таблицы расчётов для версии 1.30. Пули считаются на близкой дистанции; на дальности урон может снижаться.</div></div>
+<div class="panel full"><div class="kicker">REFERENCE // VANILLA CONFIG DATA</div><h2>ПРОЧНОСТЬ И МНОЖИТЕЛИ ЧАСТЕЙ</h2><div class="table-scroll"><table><thead><tr><th>ЧАСТЬ</th><th>HP</th><th>ВЗРЫВ</th><th>ПУЛИ</th></tr></thead><tbody id="targetTable"></tbody></table></div></div>
+<div class="panel"><div class="kicker">EXPLOSIVES</div><h2>УРОН ВЗРЫВЧАТКИ</h2><table><thead><tr><th>ПРЕДМЕТ</th><th>БАЗОВЫЙ УРОН</th></tr></thead><tbody id="explosiveTable"></tbody></table></div>
+<div class="panel"><div class="kicker">AMMUNITION</div><h2>УРОН БОЕПРИПАСОВ</h2><table><thead><tr><th>КАЛИБР / ТИП</th><th>УРОН</th></tr></thead><tbody id="ammoTable"></tbody></table></div>
 </div></section>
 <section id="checklist" hidden><div class="grid">
 <div class="panel"><div class="kicker">PRE-RAID // EQUIPMENT</div><h2>СНАРЯЖЕНИЕ</h2><div class="list" id="gearList"></div></div>
 <div class="panel"><div class="kicker">PRE-RAID // MEDICAL</div><h2>МЕДИЦИНА И ВЫЖИВАНИЕ</h2><div class="list" id="survivalList"></div></div>
-<div class="panel full"><div class="kicker">SQUAD CHECK // FINAL</div><h2>ПЕРЕД ВЫХОДОМ</h2><div class="list" id="finalList"></div><div class="actions"><button id="resetChecks" class="danger">СБРОСИТЬ ОТМЕТКИ</button></div><div class="source">Отметки сохраняются в localStorage этого браузера.</div></div>
+<div class="panel full"><div class="kicker">SQUAD CHECK // FINAL</div><h2>ПЕРЕД ВЫХОДОМ</h2><div class="list" id="finalList"></div><div class="actions"><button id="resetChecks" class="danger">СБРОСИТЬ ОТМЕТКИ</button></div></div>
 </div></section>
 </main><footer><span>CHERNARUS TALES // RAID OPERATIONS</span><span>DATASET: DAYZ 1.30.164078.38 // LOCAL CHECKLIST</span></footer></div>
 <script>
 (()=>{
 const $=id=>document.getElementById(id), STORE='ct_raid_unified_v2';
 const targets=[
-{id:'frame',name:'Рама забора / вышки',hp:12000,exp:20,bullet:1,note:'Каждая половина рамы. Разрушение рамы также разрушает закреплённые на ней панели.'},
-{id:'wood',name:'Деревянная панель (половина)',hp:16000,exp:53,bullet:1,note:'Верхняя и нижняя половины считаются отдельными частями.'},
-{id:'metal',name:'Металлическая панель (половина)',hp:21000,exp:35,bullet:1,note:'Верхняя и нижняя половины считаются отдельными частями.'},
-{id:'platform',name:'Платформа забора',hp:18000,exp:53,bullet:1,note:'Платформа секции забора.'},
-{id:'stairs',name:'Лестница вышки',hp:7500,exp:53,bullet:1,note:'Часть watchtower.'},
-{id:'roof',name:'Крыша вышки',hp:19000,exp:35,bullet:1,note:'Часть watchtower.'},
-{id:'wire',name:'Колючая проволока',hp:300,exp:40,bullet:.01,note:'Пули наносят крайне малый урон.'},
-{id:'gate',name:'Створка ворот',hp:0,exp:0,bullet:0,note:'Непосредственно не повреждается; разрушай обе рамы.'}
+{id:'frame',name:'Рама забора / вышки',hp:12000,exp:20,bullet:1},
+{id:'wood',name:'Деревянная панель (половина)',hp:16000,exp:53,bullet:1},
+{id:'metal',name:'Металлическая панель (половина)',hp:21000,exp:35,bullet:1},
+{id:'platform',name:'Платформа забора',hp:18000,exp:53,bullet:1},
+{id:'stairs',name:'Лестница вышки',hp:7500,exp:53,bullet:1},
+{id:'roof',name:'Крыша вышки',hp:19000,exp:35,bullet:1},
+{id:'wire',name:'Колючая проволока',hp:300,exp:40,bullet:.01},
+{id:'gate',name:'Створка ворот',hp:0,exp:0,bullet:0}
 ];
 const explosives=[{name:'Пластичная взрывчатка',damage:350},{name:'Мина Клеймор',damage:100},{name:'Осколочная граната (EGD-5 / 6-M7)',damage:50},{name:'Осколочная граната 40 мм',damage:50},{name:'Светошумовая граната (8-M4)',damage:5}];
 const ammo=[{name:'Патрон 5,45×39 мм',damage:115},{name:'Патрон 5,56×45 мм',damage:110},{name:'Патрон 7,62×39 мм',damage:110},{name:'Ружейная пуля 12 калибра',damage:110},{name:'Патрон .308 WIN',damage:150},{name:'Патрон 7,62×54 мм R',damage:150},{name:'Патрон 9×39 мм',damage:75},{name:'Патрон 9×19 мм',damage:40},{name:'Патрон .45 ACP',damage:40},{name:'Картечь 12 калибра (8 дробин)',damage:280}];
@@ -111,11 +107,11 @@ const checks={gear:['Оружие и боеприпасы','Запасной м�
 let state={plan:[],checks:{}};
 try{const v=JSON.parse(localStorage.getItem(STORE)||'null');if(v)state={...state,...v}}catch(e){}
 const save=()=>localStorage.setItem(STORE,JSON.stringify(state)),fmt=n=>Number.isFinite(Number(n))?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(Number(n)):'—',num=v=>{const n=Number(v);return Number.isFinite(n)&&n>0?n:0};
-const currentTarget=()=>{const t=targets.find(x=>x.id===$('target').value)||targets[0];if($('serverMode').value!=='custom')return t;return {...t,hp:num($('customHp').value),exp:num($('customExplosive').value),bullet:num($('customBullet').value),note:'Пользовательские параметры сервера.'}};
+const currentTarget=()=>{const t=targets.find(x=>x.id===$('target').value)||targets[0];if($('serverMode').value!=='custom')return t;return {...t,hp:num($('customHp').value),exp:num($('customExplosive').value),bullet:num($('customBullet').value)}};
 const multiplier=()=>{const t=currentTarget();return $('attackType').value==='explosive'?t.exp:$('attackType').value==='bullet'?t.bullet:1};
 function fillTargets(){ $('target').innerHTML=targets.map(t=>'<option value="'+t.id+'">'+t.name+'</option>').join('');$('targetTable').innerHTML=targets.map(t=>'<tr><td>'+t.name+'</td><td>'+fmt(t.hp)+'</td><td>×'+t.exp+'</td><td>×'+t.bullet+'</td></tr>').join('')}
 function fillAttack(){const kind=$('attackType').value,arr=kind==='explosive'?explosives:kind==='bullet'?ammo:[{name:'Свой тип / модификация',damage:0}];$('weapon').innerHTML=arr.map((x,i)=>'<option value="'+i+'">'+x.name+'</option>').join('');$('rawDamage').value=arr[0].damage}
-function updateTarget(){const t=currentTarget();$('customTarget').hidden=$('serverMode').value!=='custom';$('hpEach').textContent=fmt(t.hp);const count=Math.max(1,Math.floor(Number($('targetCount').value)||1));$('hpTotal').textContent=fmt(t.hp*count);$('targetNote').textContent=t.note;calc()}
+function updateTarget(){const t=currentTarget();$('customTarget').hidden=$('serverMode').value!=='custom';$('hpEach').textContent=fmt(t.hp);const count=Math.max(1,Math.floor(Number($('targetCount').value)||1));$('hpTotal').textContent=fmt(t.hp*count);calc()}
 function calc(){
  const t=currentTarget(),m=multiplier(),raw=num($('rawDamage').value),n=Math.max(1,Math.floor(num($('targetCount').value))),q=Math.max(0,Math.floor(num($('quantity').value))),per=raw*m,hp=t.hp*n,all=per>0&&hp>0?Math.ceil(hp/per):0;
  $('perHit').textContent=fmt(per);$('grandTotal').textContent=all?String(all):'—';$('stockCount').textContent=String(q);
