@@ -128,7 +128,7 @@ const KEY='ct_language', words={
 'Предметы, оружие, еда и другие полезные вещи.':'Items, weapons, food and other useful supplies.',
 'Новый игрок, который только появился на побережье.':'A new player who has just spawned on the coast.',
 'Игрок с хорошим снаряжением и оружием.':'A player with good gear and weapons.',
-'База или укреплённое убежище игроков.':'A player-built base or fortified shelter.'
+'База или укреплённое убежище игроков.':'A player-built base or fortified shelter.',
 'Состояние системы':'System Status','Подключение карты Chernarus…':'Connecting to Chernarus map…',
 'Режим включён: нажми на нужное место карты.':'Mode enabled: click the desired location on the map.',
 'Выбери тип отметки, затем нажми на карту.':'Choose a marker type, then click the map.',
