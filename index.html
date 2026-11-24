@@ -931,6 +931,13 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
             которые могут помочь тебе пережить ещё один день.
           </p>
 
+          <div class="archive-menu" id="archive-menu" aria-label="Разделы архива">
+            <button class="archive-menu-button" type="button" data-archive="0"><span class="archive-menu-code">FILE_001 // HISTORY</span><span class="archive-menu-title">История Черноруси</span><span class="archive-menu-hint">Открыть досье →</span></button>
+            <button class="archive-menu-button" type="button" data-archive="1"><span class="archive-menu-code">FILE_002 // SURVIVAL</span><span class="archive-menu-title">Выживание</span><span class="archive-menu-hint">Открыть досье →</span></button>
+            <button class="archive-menu-button" type="button" data-archive="2"><span class="archive-menu-code">FILE_003 // LOCATIONS</span><span class="archive-menu-title">Опасные места</span><span class="archive-menu-hint">Открыть досье →</span></button>
+            <button class="archive-menu-button" type="button" data-archive="3"><span class="archive-menu-code">FILE_004 // CLASSIFIED</span><span class="archive-menu-title">Секретные материалы</span><span class="archive-menu-hint">Открыть досье →</span></button>
+          </div>
+
           <div class="archive-files">
             <article class="archive-file">
               <div class="archive-file-tag">FILE_001 // HISTORY</div>
@@ -1247,6 +1254,30 @@ function updateArchiveLanguage(){
 window.addEventListener('ct-language-change',updateArchiveLanguage);
 document.addEventListener('DOMContentLoaded',updateArchiveLanguage);
 updateArchiveLanguage();
+})();
+</script>
+
+<script>
+(()=>{
+ function initArchiveReader(){
+  const home=document.getElementById('home'),menu=document.getElementById('archive-menu');
+  if(!home||!menu||menu.dataset.ready==='1')return;
+  const files=[...home.querySelectorAll('.archive-files > .archive-file')];
+  if(files.length!==4)return;
+  menu.dataset.ready='1';
+  files.forEach(file=>{
+   const back=document.createElement('button');
+   back.type='button';back.className='archive-back';back.textContent='← НАЗАД К РАЗДЕЛАМ';
+   back.addEventListener('click',()=>{file.classList.remove('is-open');menu.hidden=false;menu.scrollIntoView({behavior:'smooth',block:'start'});});
+   file.insertBefore(back,file.firstChild);
+  });
+  menu.querySelectorAll('[data-archive]').forEach(button=>button.addEventListener('click',()=>{
+   const index=Number(button.dataset.archive);
+   files.forEach((file,i)=>file.classList.toggle('is-open',i===index));
+   menu.hidden=true;files[index].scrollIntoView({behavior:'smooth',block:'start'});
+  }));
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initArchiveReader);else initArchiveReader();
 })();
 </script>
 
