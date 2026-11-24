@@ -126,6 +126,7 @@
         <input id="importFile" type="file" accept=".json,application/json" hidden>
         <button class="wide danger" id="clearBtn">Удалить все мои отметки</button>
         <div class="status" id="countStatus"></div>
+        <div class="status" id="tileStatus">Подключение карты Chernarus…</div>
       </section>
 
       <p class="small">
@@ -148,7 +149,7 @@
 
   const map = L.map("map", {
     crs: L.CRS.Simple,
-    minZoom: -3,
+    minZoom: -5,
     maxZoom: 3,
     zoomSnap: 0.25,
     zoomDelta: 0.5,
@@ -157,56 +158,68 @@
     attributionControl: true
   });
 
-  // 30x30 исходных тайлов. При отдалении объединяем несколько исходных
-  // изображений в один экранный тайл; при приближении обрезаем нужную часть.
+  // Chernarus tile set: 30 × 30 source images, each 512 × 512.
+  // Leaflet CRS.Simple uses negative Y tile coordinates; convert them to
+  // source rows counted from the top of the map.
+  let successfulTiles = 0;
+  let failedTiles = 0;
   const ChernarusLayer = L.GridLayer.extend({
     createTile(coords, done) {
       const canvas = document.createElement("canvas");
       canvas.width = canvas.height = TILE_SIZE;
       const ctx = canvas.getContext("2d");
+      const z = Math.round(coords.z);
 
-      const loadTile = (x, y, onload) => {
+      const loadSource = (sx, sy, draw) => {
+        if (sx < 0 || sx >= TILE_COUNT || sy < 0 || sy >= TILE_COUNT) {
+          draw(null);
+          return;
+        }
         const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => onload(img, true);
-        img.onerror = () => onload(null, false);
-        img.src = TILE_BASE + `S_${String(x).padStart(3,"0")}_${String(y).padStart(3,"0")}_lco.png`;
+        img.onload = () => { successfulTiles++; draw(img); };
+        img.onerror = () => { failedTiles++; draw(null); };
+        img.src = TILE_BASE + `S_${String(sx).padStart(3,"0")}_${String(sy).padStart(3,"0")}_lco.png`;
       };
 
-      if (coords.z < 0) {
-        const factor = Math.pow(2, -coords.z);
-        const gridSize = Math.ceil(TILE_COUNT / factor);
-        const startX = coords.x * factor;
-        const startY = (coords.y + gridSize) * factor;
+      if (z <= 0) {
+        const factor = Math.pow(2, -z);
+        const gridCount = Math.ceil(TILE_COUNT / factor);
+        const topRow = coords.y + gridCount;
+        const sourceStartX = coords.x * factor;
+        const sourceStartY = topRow * factor;
         const drawSize = TILE_SIZE / factor;
         const jobs = [];
+
         for (let dy = 0; dy < factor; dy++) {
           for (let dx = 0; dx < factor; dx++) {
-            const sx = startX + dx, sy = startY + dy;
+            const sx = sourceStartX + dx;
+            const sy = sourceStartY + dy;
             if (sx < TILE_COUNT && sy < TILE_COUNT) jobs.push({sx, sy, dx, dy});
           }
         }
         if (!jobs.length) { done(null, canvas); return canvas; }
-        let remaining = jobs.length;
-        jobs.forEach(job => loadTile(job.sx, job.sy, (img, ok) => {
-          if (ok) ctx.drawImage(img, job.dx * drawSize, job.dy * drawSize, drawSize, drawSize);
-          remaining--;
-          if (!remaining) done(null, canvas);
+
+        let pending = jobs.length;
+        jobs.forEach(job => loadSource(job.sx, job.sy, img => {
+          if (img) ctx.drawImage(img, job.dx * drawSize, job.dy * drawSize, drawSize, drawSize);
+          pending--;
+          if (pending === 0) done(null, canvas);
         }));
       } else {
-        const scale = Math.pow(2, coords.z);
-        const sourceX = Math.floor(coords.x / scale);
-        const rowFromTop = coords.y + TILE_COUNT * scale;
-        const sourceY = Math.floor(rowFromTop / scale);
-        const subX = ((coords.x % scale) + scale) % scale;
-        const subY = ((rowFromTop % scale) + scale) % scale;
-        if (sourceX < 0 || sourceX >= TILE_COUNT || sourceY < 0 || sourceY >= TILE_COUNT) {
-          done(null, canvas); return canvas;
-        }
-        loadTile(sourceX, sourceY, (img, ok) => {
-          if (ok) {
-            const part = TILE_SIZE / scale;
-            ctx.drawImage(img, subX * part, subY * part, part, part, 0, 0, TILE_SIZE, TILE_SIZE);
+        const factor = Math.pow(2, z);
+        const topPixelRow = coords.y + TILE_COUNT * factor;
+        const sx = Math.floor(coords.x / factor);
+        const sy = Math.floor(topPixelRow / factor);
+        const subX = ((coords.x % factor) + factor) % factor;
+        const subY = ((topPixelRow % factor) + factor) % factor;
+        const crop = TILE_SIZE / factor;
+
+        loadSource(sx, sy, img => {
+          if (img) {
+            ctx.drawImage(img, subX * crop, subY * crop, crop, crop, 0, 0, TILE_SIZE, TILE_SIZE);
+          } else {
+            ctx.fillStyle = "#343b32";
+            ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
           }
           done(null, canvas);
         });
@@ -214,10 +227,33 @@
       return canvas;
     }
   });
-  new ChernarusLayer({ tileSize: TILE_SIZE, noWrap: true, bounds: [[0,0],[WORLD,WORLD]] })
-    .addTo(map);
+
+  const baseLayer = new ChernarusLayer({
+    tileSize: TILE_SIZE,
+    minZoom: -5,
+    maxZoom: 3,
+    noWrap: true,
+    keepBuffer: 1,
+    updateWhenZooming: false
+  }).addTo(map);
 
   map.setView([WORLD / 2, WORLD / 2], -2);
+  map.on("tileload", () => {
+    const el = document.getElementById("tileStatus");
+    if (el) el.textContent = `Карта загружается · тайлов получено: ${successfulTiles}`;
+  });
+  map.on("tileerror", () => {
+    const el = document.getElementById("tileStatus");
+    if (el) el.textContent = "Ошибка загрузки одного или нескольких фрагментов карты.";
+  });
+  setTimeout(() => {
+    const el = document.getElementById("tileStatus");
+    if (el) {
+      el.textContent = successfulTiles
+        ? `Тайлы карты загружены: ${successfulTiles}`
+        : "Пока нет загруженных тайлов. Проверьте доступ к raw.githubusercontent.com.";
+    }
+  }, 8000);
 
   const layers = {
     pin: L.layerGroup().addTo(map),
