@@ -1,6 +1,7 @@
 (()=> {
 const KEY='ct_language', words={
-'КОМИКСЫ И ФАКТЫ':'COMICS & FACTS','НАВИГАТОР':'NAVIGATOR','РАЗГОВОРНИК':'PHRASEBOOK','РЕЙД':'RAID',
+'КОМИКСЫ И ФАКТЫ':'COMICS & FACTS','▣ АРХИВ ЧЕРНОРУСИ':'▣ CHERNARUS ARCHIVE','⌖ КАРТА':'⌖ MAP','КАРТА':'MAP','АРХИВ ЧЕРНОРУСИ':'CHERNARUS ARCHIVE','НАВИГАТОР':'NAVIGATOR','РАЗГОВОРНИК':'PHRASEBOOK','РЕЙД':'RAID',
+'Карта Черноруси':'Chernarus Map','Карта Черноруси. Перемещай и масштабируй её, чтобы рассмотреть детали.':'Chernarus map. Pan and zoom to explore the details.','Тактическая карта Черноруси':'Chernarus Tactical Map','Названия городов и деревень':'Town and village names','Приблизить':'Zoom in','Отдалить':'Zoom out','Сбросить масштаб':'Reset zoom','Скрыть все названия':'Hide all labels','Показать все названия':'Show all labels',
 'Архив Черноруси':'Chernarus Archive','Добро пожаловать в информационную сеть выживших.':'Welcome to the survivors’ information network.',
 'Здесь собраны материалы, заметки, истории и сведения,':'This archive contains materials, notes, stories and information',
 'которые могут помочь тебе пережить ещё один день.':'that may help you survive another day.',
