@@ -260,7 +260,7 @@ const KEY='ct_language', words={
 'Система рейда активна':'Raid system active',
 'NO ONE IS COMING TO SAVE YOU.':'НИКТО НЕ ПРИДЁТ ТЕБЯ СПАСАТЬ.',
 'UNOFFICIAL DAYZ FAN PROJECT':'НЕОФИЦИАЛЬНЫЙ ФАН-ПРОЕКТ DAYZ',
-'ВРЕМЯ: ':'TIME: '
+
 ,'RAID OPERATIONS // CHERNARUS':'RAID OPERATIONS // CHERNARUS',
 'RAID SYSTEM ACTIVE':'RAID SYSTEM ACTIVE',
 'VANILLA CONFIG DATA':'VANILLA CONFIG DATA',
