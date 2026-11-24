@@ -8,7 +8,7 @@
   <title>CHERNARUS TALES — Тактическая карта</title>
 
   <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin="">
 
@@ -735,15 +735,15 @@
 </div>
 
 <script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
   crossorigin="">
 </script>
 
 <script>
 (() => {
-  const TILE_BASE =
-    "https://raw.githubusercontent.com/ScullyXlife/dayz-map-tiles-public/main/maps/chernarus/layers/";
+  const TILE_BASE = "https://cdn.jsdelivr.net/gh/ScullyXlife/dayz-map-tiles-public@main/maps/chernarus/layers/";
+  const TILE_FALLBACK = "https://raw.githubusercontent.com/ScullyXlife/dayz-map-tiles-public/main/maps/chernarus/layers/";
 
   const TILE_SIZE = 512;
   const TILE_COUNT = 30;
@@ -782,21 +782,15 @@
           return;
         }
 
+        const file = `S_${String(sx).padStart(3,"0")}_${String(sy).padStart(3,"0")}_lco.png`;
         const img = new Image();
-
-        img.onload = () => {
-          successfulTiles++;
-          draw(img);
-        };
-
+        let triedFallback = false;
+        img.onload = () => { successfulTiles++; draw(img); };
         img.onerror = () => {
-          failedTiles++;
-          draw(null);
+          if (!triedFallback) { triedFallback = true; img.src = TILE_FALLBACK + file; return; }
+          failedTiles++; draw(null);
         };
-
-        img.src =
-          TILE_BASE +
-          `S_${String(sx).padStart(3,"0")}_${String(sy).padStart(3,"0")}_lco.png`;
+        img.src = TILE_BASE + file;
       };
 
       if (z <= 0) {
@@ -897,6 +891,15 @@
   }).addTo(map);
 
   map.setView([WORLD / 2, WORLD / 2], -2);
+  // Recalculate Leaflet dimensions after the map's parent tab/iframe becomes visible.
+  const refreshMapSize = () => requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+  window.addEventListener("resize", refreshMapSize);
+  window.addEventListener("message", event => {
+    if (event.data === "CT_MAP_VISIBLE") refreshMapSize();
+  });
+  if ("ResizeObserver" in window) new ResizeObserver(refreshMapSize).observe(document.getElementById("map"));
+  setTimeout(refreshMapSize, 250);
+  setTimeout(refreshMapSize, 900);
 
   map.on("tileload", () => {
     const el = document.getElementById("tileStatus");
