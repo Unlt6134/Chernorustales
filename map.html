@@ -624,6 +624,12 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
           🔴 PvP-зоны
         </label>
       </section>
+      <section class="group">
+        <div class="section-title">Объекты Черноруси</div>
+        <label class="legend"><input type="checkbox" id="showMilitary" checked> 🪖 Военные объекты</label>
+        <label class="legend"><input type="checkbox" id="showPolice" checked> 🚓 Полицейские зоны</label>
+        <div class="small">Полицейские точки — ориентиры по официальным игровым зонам появления полицейских заражённых; они не всегда совпадают с точным зданием участка.</div>
+      </section>
 
       <section class="group">
         <div class="section-title">Параметры отметки</div>
@@ -795,10 +801,53 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
     }
     visibleTiles=current;
     drawMarks();
+    drawPOIs();
     ctx.strokeStyle="#8dbb91";ctx.lineWidth=1;ctx.strokeRect(0.5,0.5,width-1,height-1);
     ctx.fillStyle="#d2e5d4";ctx.font="10px Courier New";ctx.textAlign="left";ctx.fillText("X: "+Math.round(centerX)+"  Z: "+Math.round(WORLD-centerY)+"  ZOOM: "+scale.toFixed(3),12,height-14);
   }
   function colorFor(type){return {pin:"#a1e6a8",loot:"#d4b35e",safe:"#49bd72",pvp:"#d45b50"}[type]||"#a1e6a8";}
+  const pois = [
+    {id:"nwaf",type:"military",name:"Северо-Западный аэродром (NWAF)",x:4500,z:10200},
+    {id:"neaf",type:"military",name:"Северо-Восточный аэродром (NEAF)",x:12000,z:12500},
+    {id:"tisy",type:"military",name:"Тисы — военный комплекс",x:1600,z:14000},
+    {id:"vybor",type:"military",name:"Военная база Выбор",x:3800,z:8900},
+    {id:"balota",type:"military",name:"Аэродром Балота",x:5000,z:2500},
+    {id:"pavlovo",type:"military",name:"Военный комплекс Павлово",x:2000,z:3500},
+    {id:"zeleno",type:"military",name:"Военный комплекс Зеленогорск",x:2700,z:5200},
+    {id:"myshkino",type:"military",name:"Военный лагерь Мышкино",x:2000,z:7500},
+    {id:"kamensk",type:"military",name:"Военный комплекс Каменск",x:7000,z:14500},
+    {id:"tri-kresta",type:"military",name:"Три Креста — военный лагерь",x:11000,z:12000}
+  ];
+  const policeHints=[[6636.79,2578.75],[10455,2265],[12920.6,10188],[13824,13215],[9537,8814],[11490,14482.5],[11070,12480],[7161.43,7671.43],[2770,5350],[6005.14,10336.3],[7736.67,12630],[3426.67,13010],[3729.76,8935],[12062,3592.25],[11186.7,6586.67],[10176.9,5533.33],[6213.36,2928.93],[5882.14,4690.71],[3589.29,2453.57],[2772.5,1267.5]];
+  policeHints.forEach((p,i)=>pois.push({id:"police-"+i,type:"police",name:"Полицейская зона — ориентир "+(i+1),x:p[0],z:p[1]}));
+  function drawPOIs(){
+    for(const poi of pois){
+      if(poi.type==="military"&&!document.getElementById("showMilitary").checked)continue;
+      if(poi.type==="police"&&!document.getElementById("showPolice").checked)continue;
+      const p=worldToScreen(poi.x,WORLD-poi.z);
+      if(p.x < -25 || p.y < -25 || p.x > width+25 || p.y > height+25)continue;
+      const c=poi.type==="military"?"#e1b85c":"#79b9e8";
+      ctx.save();ctx.translate(p.x,p.y);ctx.shadowColor="#000";ctx.shadowBlur=5;
+      ctx.fillStyle="#101a13";ctx.strokeStyle=c;ctx.lineWidth=2;ctx.beginPath();
+      if(poi.type==="military"){ctx.moveTo(0,-10);ctx.lineTo(9,0);ctx.lineTo(0,10);ctx.lineTo(-9,0);ctx.closePath();}
+      else ctx.arc(0,0,8,0,Math.PI*2);
+      ctx.fill();ctx.stroke();ctx.fillStyle=c;ctx.font="bold 10px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(poi.type==="military"?"M":"P",0,0);ctx.restore();
+    }
+  }
+  function nearestPOI(point){
+    let best=null,dist=18;
+    for(const poi of pois){
+      if(poi.type==="military"&&!document.getElementById("showMilitary").checked)continue;
+      if(poi.type==="police"&&!document.getElementById("showPolice").checked)continue;
+      const p=worldToScreen(poi.x,WORLD-poi.z),d=Math.hypot(p.x-point.x,p.y-point.y);
+      if(d<dist){best=poi;dist=d;}
+    }return best;
+  }
+  function showPOIPopup(poi,point){
+    const c=poi.type==="military"?"#e1b85c":"#79b9e8";
+    popup.innerHTML='<div class="popup-title" style="color:'+c+'">'+esc(poi.name)+'</div><div class="small">'+(poi.type==="military"?"Военный объект":"Полицейский ориентир")+'</div><div class="small">X: '+Math.round(poi.x)+' · Z: '+Math.round(poi.z)+'</div>';
+    popup.hidden=false;popup.style.left=Math.max(110,Math.min(width-110,point.x))+"px";popup.style.top=Math.max(100,point.y-10)+"px";
+  }
   function drawMarks(){
     marks.forEach(m=>{
       const p=worldToScreen(Number(m.lng),WORLD-Number(m.lat));
@@ -864,16 +913,28 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
     document.getElementById("markerName").value="";saveMarks();setMode(null);hidePopup();
   }
   function localPoint(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
-  canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY,cx:centerX,cy:centerY,moved:false,start:localPoint(e)};hidePopup();});
-  canvas.addEventListener("pointermove",e=>{if(!drag||drag.id!==e.pointerId)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4)drag.moved=true;centerX=drag.cx-dx/scale;centerY=drag.cy-dy/scale;requestRender();});
-  canvas.addEventListener("pointerup",e=>{
-    if(!drag||drag.id!==e.pointerId)return;
-    const wasMoved=drag.moved,point=localPoint(e);drag=null;
-    if(wasMoved)return;
-    const hit=nearestMark(point);if(hit){showPopup(hit,point);return;}
-    if(mode)addMark(point);
+  const activePointers=new Map();
+  let pinch=null,suppressTap=false;
+  function midpoint(a,b){return{x:(a.x+b.x)/2,y:(a.y+b.y)/2};}
+  function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+  canvas.addEventListener("pointerdown",e=>{
+    canvas.setPointerCapture(e.pointerId);const p=localPoint(e);activePointers.set(e.pointerId,p);hidePopup();
+    if(activePointers.size===2){const pts=[...activePointers.values()],mid=midpoint(pts[0],pts[1]);pinch={distance:Math.max(1,distance(pts[0],pts[1])),scale,anchor:screenToWorld(mid.x,mid.y)};drag=null;suppressTap=true;}
+    else if(activePointers.size===1)drag={id:e.pointerId,x:e.clientX,y:e.clientY,cx:centerX,cy:centerY,moved:false,start:p};
   });
-  canvas.addEventListener("pointercancel",()=>{drag=null;});
+  canvas.addEventListener("pointermove",e=>{
+    if(!activePointers.has(e.pointerId))return;activePointers.set(e.pointerId,localPoint(e));
+    if(activePointers.size>=2&&pinch){const pts=[...activePointers.values()],mid=midpoint(pts[0],pts[1]),d=Math.max(1,distance(pts[0],pts[1]));scale=Math.max(minScale,Math.min(maxScale,pinch.scale*d/pinch.distance));centerX=pinch.anchor.x-(mid.x-width/2)/scale;centerY=pinch.anchor.y-(mid.y-height/2)/scale;requestRender();return;}
+    if(!drag||drag.id!==e.pointerId)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4)drag.moved=true;centerX=drag.cx-dx/scale;centerY=drag.cy-dy/scale;requestRender();
+  });
+  function endPointer(e){
+    if(!activePointers.has(e.pointerId))return;const wasPinching=!!pinch;activePointers.delete(e.pointerId);
+    if(wasPinching){pinch=null;drag=null;suppressTap=true;if(activePointers.size===1){const [id,p]=[...activePointers.entries()][0];drag={id,x:p.x,y:p.y,cx:centerX,cy:centerY,moved:true,start:p};}if(activePointers.size===0)suppressTap=false;return;}
+    if(!drag||drag.id!==e.pointerId)return;const moved=drag.moved,point=localPoint(e);drag=null;if(moved||suppressTap)return;
+    const poi=nearestPOI(point);if(poi){showPOIPopup(poi,point);return;}const hit=nearestMark(point);if(hit){showPopup(hit,point);return;}if(mode)addMark(point);
+  }
+  canvas.addEventListener("pointerup",endPointer);
+  canvas.addEventListener("pointercancel",e=>{activePointers.delete(e.pointerId);pinch=null;drag=null;if(!activePointers.size)suppressTap=false;});
   canvas.addEventListener("wheel",e=>{e.preventDefault();const p=localPoint(e),before=screenToWorld(p.x,p.y),factor=e.deltaY<0?1.18:1/1.18;scale=Math.max(minScale,Math.min(maxScale,scale*factor));const after=screenToWorld(p.x,p.y);centerX+=before.x-after.x;centerY+=before.y-after.y;requestRender();},{passive:false});
   document.getElementById("zoomIn").onclick=()=>zoomAt(width/2,height/2,1.35);
   document.getElementById("zoomOut").onclick=()=>zoomAt(width/2,height/2,1/1.35);
@@ -884,7 +945,7 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
   document.getElementById("safeMode").onclick=()=>setMode("safe");
   document.getElementById("pvpMode").onclick=()=>setMode("pvp");
   document.getElementById("cancelMode").onclick=()=>setMode(null);
-  ["showPins","showLoot","showSafe","showPvp"].forEach(id=>document.getElementById(id).addEventListener("change",setVisibility));
+  ["showPins","showLoot","showSafe","showPvp","showMilitary","showPolice"].forEach(id=>document.getElementById(id).addEventListener("change",()=>{setVisibility();requestRender();}));
   document.getElementById("exportBtn").onclick=()=>{
     const blob=new Blob([JSON.stringify(marks,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
     a.href=url;a.download="my-chernarus-markers.json";a.click();URL.revokeObjectURL(url);
