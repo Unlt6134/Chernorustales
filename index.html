@@ -795,6 +795,19 @@ footer span {
 
 /* Unified typography: compact interface and subdued helper text */
 html,body,button,input,select,textarea{font-family:"Courier New",monospace!important}
+
+/* Survivor phrasebook */
+.phrasebook{margin-top:18px}
+.phrase-categories{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.phrase-category{font:inherit;font-size:12px;padding:9px 12px;border:1px solid var(--border,#31543a);background:rgba(8,20,12,.8);color:var(--text,#c5d6c7);cursor:pointer}
+.phrase-category.active{border-color:var(--green,#8ce99a);color:var(--green,#8ce99a);background:rgba(70,140,80,.13)}
+.phrase-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.phrase-card{min-width:0;border:1px solid rgba(130,190,140,.28);background:rgba(5,16,9,.72);padding:14px}
+.phrase-card .phrase-code{font-size:9px;letter-spacing:1.4px;color:#79947e;margin-bottom:8px}
+.phrase-card .phrase-main{font-size:15px;line-height:1.45;color:#b9edbd;font-weight:700;overflow-wrap:anywhere}
+.phrase-card .phrase-translation{font-size:11px;line-height:1.5;color:#a3afa4;margin-top:7px;overflow-wrap:anywhere}
+.phrase-hint{font-size:10px;line-height:1.5;color:#819184;margin-top:14px}
+@media(max-width:620px){.phrase-list{grid-template-columns:1fr}.phrase-category{font-size:11px;padding:8px 10px}.phrase-card{padding:12px}.phrase-card .phrase-main{font-size:14px}}
 </style>
 <style>
       .ct-lang-toggle{display:inline-block!important;position:relative;z-index:20;margin:14px auto 4px;padding:8px 20px;min-width:64px;border:1px solid #78c982;border-radius:3px;background:#102016;color:#c2ffc2;font:700 13px Consolas,monospace;letter-spacing:1px;cursor:pointer;box-shadow:0 0 14px rgba(107,210,118,.18)}
@@ -986,67 +999,23 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
         <!-- РАЗГОВОРНИК -->
 
         <section id="dictionary" class="tab-content">
-
-          <h2 class="section-heading">Разговорник выжившего</h2>
-
-          <p class="section-description">
-            Основные термины и выражения,
-            которые можно встретить в общении между выжившими.
-          </p>
-
-          <div class="card-grid">
-
-            <article class="info-card">
-              <div class="card-info">
-                <div class="card-code">TERM_001</div>
-                <h3>KOS</h3>
-              </div>
-              <p>Kill On Sight — убивать при встрече, без переговоров.</p>
-            </article>
-
-            <article class="info-card">
-              <div class="card-info">
-                <div class="card-code">TERM_002</div>
-                <h3>Friendly?</h3>
-              </div>
-              <p>Вопрос о намерениях встреченного игрока.</p>
-            </article>
-
-            <article class="info-card">
-              <div class="card-info">
-                <div class="card-code">TERM_003</div>
-                <h3>Loot</h3>
-              </div>
-              <p>Предметы, оружие, еда и другие полезные вещи.</p>
-            </article>
-
-            <article class="info-card">
-              <div class="card-info">
-                <div class="card-code">TERM_004</div>
-                <h3>Freshie</h3>
-              </div>
-              <p>Новый игрок, который только появился на побережье.</p>
-            </article>
-
-            <article class="info-card">
-              <div class="card-info">
-                <div class="card-code">TERM_005</div>
-                <h3>Geared</h3>
-              </div>
-              <p>Игрок с хорошим снаряжением и оружием.</p>
-            </article>
-
-            <article class="info-card">
-              <div class="card-info">
-                <div class="card-code">TERM_006</div>
-                <h3>Base</h3>
-              </div>
-              <p>База или укреплённое убежище игроков.</p>
-            </article>
-
-          </div>
-
-        </section>
+<h2 class="section-heading">Разговорник выжившего</h2>
+<p class="section-description">Фразы для общения с другими выжившими. Выбирай категорию и используй готовые выражения.</p>
+<div class="phrasebook" id="phrasebook">
+<div class="phrase-categories" role="tablist" aria-label="Категории разговорника">
+<button class="phrase-category active" data-category="all">Все фразы</button>
+<button class="phrase-category" data-category="aggression">Агрессия</button>
+<button class="phrase-category" data-category="questions">Вопросы</button>
+<button class="phrase-category" data-category="friendly">Мирный контакт</button>
+<button class="phrase-category" data-category="trade">Обмен и помощь</button>
+<button class="phrase-category" data-category="navigation">Место и направление</button>
+<button class="phrase-category" data-category="team">Командная связь</button>
+<button class="phrase-category" data-category="danger">Опасность</button>
+</div>
+<div class="phrase-list" id="phraseList" aria-live="polite"></div>
+<p class="phrase-hint">В русском режиме показаны английские фразы с русским переводом. В английском режиме — русские фразы с английским переводом.</p>
+</div>
+</section>
 
         <!-- ШПАРГАЛКА -->
 
@@ -1160,6 +1129,69 @@ function updateClock() {
 
 updateClock();
 setInterval(updateClock, 1000);
+</script>
+
+
+<script>
+(()=>{
+const entries=[
+{c:'aggression',en:'Drop your weapon!',ru:'Брось оружие!'},
+{c:'aggression',en:'Get out of here!',ru:'Убирайся отсюда!'},
+{c:'aggression',en:'I will shoot!',ru:'Я буду стрелять!'},
+{c:'aggression',en:'Stay back!',ru:'Не подходи!'},
+{c:'aggression',en:'This is your last warning.',ru:'Это последнее предупреждение.'},
+{c:'aggression',en:'Put your hands up!',ru:'Руки вверх!'},
+{c:'questions',en:'Are you friendly?',ru:'Ты дружелюбен?'},
+{c:'questions',en:'Do you speak English?',ru:'Ты говоришь по-английски?'},
+{c:'questions',en:'Are you alone?',ru:'Ты один?'},
+{c:'questions',en:'Where are you going?',ru:'Куда ты направляешься?'},
+{c:'questions',en:'Do you have a mic?',ru:'У тебя есть микрофон?'},
+{c:'questions',en:'Have you seen anyone nearby?',ru:'Ты видел кого-нибудь поблизости?'},
+{c:'friendly',en:'I am friendly.',ru:'Я настроен дружелюбно.'},
+{c:'friendly',en:'I do not want trouble.',ru:'Мне не нужны неприятности.'},
+{c:'friendly',en:'I am just passing through.',ru:'Я просто прохожу мимо.'},
+{c:'friendly',en:'You can lower your weapon.',ru:'Можешь опустить оружие.'},
+{c:'friendly',en:'Let us go our separate ways.',ru:'Давай разойдёмся мирно.'},
+{c:'friendly',en:'Nice to meet you. Good luck!',ru:'Рад знакомству. Удачи!'},
+{c:'trade',en:'Do you want to trade?',ru:'Хочешь обменяться?'},
+{c:'trade',en:'I can give you some food.',ru:'Я могу дать тебе немного еды.'},
+{c:'trade',en:'I need ammunition.',ru:'Мне нужны патроны.'},
+{c:'trade',en:'Do you have any medicine?',ru:'У тебя есть лекарства?'},
+{c:'trade',en:'Can you help me?',ru:'Можешь мне помочь?'},
+{c:'trade',en:'Thank you. I owe you one.',ru:'Спасибо. Я твой должник.'},
+{c:'navigation',en:'Where is the nearest town?',ru:'Где ближайший город?'},
+{c:'navigation',en:'I am heading north.',ru:'Я направляюсь на север.'},
+{c:'navigation',en:'The military base is nearby.',ru:'Военная база неподалёку.'},
+{c:'navigation',en:'Meet me at the road.',ru:'Встретимся у дороги.'},
+{c:'navigation',en:'Follow the railway.',ru:'Следуй вдоль железной дороги.'},
+{c:'navigation',en:'The coast is that way.',ru:'Побережье в той стороне.'},
+{c:'team',en:'Cover me!',ru:'Прикрой меня!'},
+{c:'team',en:'I am moving in.',ru:'Я захожу.'},
+{c:'team',en:'Hold your position.',ru:'Удерживай позицию.'},
+{c:'team',en:'Check your surroundings.',ru:'Осмотрись по сторонам.'},
+{c:'team',en:'I need a magazine.',ru:'Мне нужен магазин.'},
+{c:'team',en:' regroup at the building.',ru:'Перегруппируемся у здания.'},
+{c:'danger',en:'There is a sniper!',ru:'Там снайпер!'},
+{c:'danger',en:'I hear footsteps.',ru:'Я слышу шаги.'},
+{c:'danger',en:'Zombies behind you!',ru:'Сзади заражённые!'},
+{c:'danger',en:'Watch out! Landmine!',ru:'Осторожно! Мина!'},
+{c:'danger',en:'I am bleeding.',ru:'У меня кровотечение.'},
+{c:'danger',en:'The area is not safe.',ru:'Это место небезопасно.'}
+];
+const names={all:'Все фразы',aggression:'Агрессия',questions:'Вопросы',friendly:'Мирный контакт',trade:'Обмен и помощь',navigation:'Место и направление',team:'Командная связь',danger:'Опасность'};
+let active='all';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(){
+const lang=localStorage.getItem('ct_language')==='en'?'en':'ru';
+const list=document.getElementById('phraseList');if(!list)return;
+const shown=entries.filter(x=>active==='all'||x.c===active);
+list.innerHTML=shown.map((x,i)=>'<article class="phrase-card"><div class="phrase-code">'+x.c.toUpperCase()+' // '+String(i+1).padStart(2,'0')+'</div><div class="phrase-main">'+esc(lang==='ru'?x.en:x.ru)+'</div><div class="phrase-translation">'+esc(lang==='ru'?x.ru:x.en)+'</div></article>').join('');
+document.querySelectorAll('.phrase-category').forEach(b=>{b.classList.toggle('active',b.dataset.category===active);b.textContent=lang==='en'?({all:'All phrases',aggression:'Aggression',questions:'Questions',friendly:'Friendly contact',trade:'Trade & help',navigation:'Places & directions',team:'Team communication',danger:'Danger'}[b.dataset.category]):names[b.dataset.category]});
+}
+document.querySelectorAll('.phrase-category').forEach(b=>b.addEventListener('click',()=>{active=b.dataset.category;render()}));
+window.addEventListener('ct-language-change',render);
+document.addEventListener('DOMContentLoaded',render);render();
+})();
 </script>
 
 <script src="language.js"></script>
