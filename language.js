@@ -345,11 +345,13 @@ localStorage.setItem(KEY,lang);
 window.dispatchEvent(new CustomEvent('ct-language-change',{detail:{lang}}));
 }
 function init(){
-const b=document.getElementById('ct-lang-toggle');
-if(b){
- b.addEventListener('click',()=>apply((localStorage.getItem(KEY)||'ru')==='ru'?'en':'ru'));
-}
 apply(localStorage.getItem(KEY)||'ru');
+document.addEventListener('click',e=>{
+ const button=e.target.closest('#ct-lang-toggle');
+ if(!button)return;
+ const next=(localStorage.getItem(KEY)||'ru')==='ru'?'en':'ru';
+ apply(next);
+});
 window.addEventListener('storage',e=>{if(e.key===KEY)apply(e.newValue||'ru')});
 const observer=new MutationObserver(records=>{
  const lang=localStorage.getItem(KEY)||'ru';
