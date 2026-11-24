@@ -15,7 +15,7 @@ const KEY='ct_language', words={
 'и информация, которую лучше не игнорировать.':'and information best not ignored.',
 'Сообщение системы':'System Message','Система архива запущена.':'Archive system initialized.',
 'Доступ к информационным разделам открыт.':'Access to information sections granted.',
-'ПОМНИ: доверять можно не каждому.':'REMEMBER: not everyone can be trusted.',
+'ПОМНИ:':'REMEMBER:',' доверять можно не каждому.':' not everyone can be trusted.','доверять можно не каждому.':'not everyone can be trusted.',
 'Запасы ограничены. Любой выстрел может привлечь внимание.':'Supplies are limited. Any shot can draw attention.',
 'Тактический навигатор':'Tactical Navigator','Интерактивная карта Черноруси.':'Interactive map of Chernarus.',
 'Используй её для планирования маршрутов,':'Use it to plan routes,',
