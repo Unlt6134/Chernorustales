@@ -93,7 +93,21 @@ const KEY='ct_language', words={
 'Часть watchtower.':'Part of the watchtower.',
 'Радиус зоны (условные метры)':'ZONE RADIUS (APPROX. METERS)',
 'Система архива запущена.':'Archive system initialized.',
-'ЛИЧНЫЕ ОТМЕТКИ':'PERSONAL MARKERS'
+'ЛИЧНЫЕ ОТМЕТКИ':'PERSONAL MARKERS',
+'Состояние системы':'System Status','Подключение карты Chernarus…':'Connecting to Chernarus map…',
+'Режим включён: нажми на нужное место карты.':'Mode enabled: click the desired location on the map.',
+'Выбери тип отметки, затем нажми на карту.':'Choose a marker type, then click the map.',
+'Файл должен содержать массив отметок':'The file must contain an array of markers',
+'Удалить все личные отметки из этого браузера?':'Delete all personal markers from this browser?',
+'Мои отметки':'My Markers','Фильтры карты':'Map Filters','Параметры отметки':'Marker Settings',
+'Радиус зоны (условные метры)':'Zone Radius (approx. meters)','Название отметки':'Marker Name',
+'Экспорт отметок JSON':'Export Markers JSON','Импорт отметок JSON':'Import Markers JSON',
+'Личные отметки хранятся в памяти браузера.':'Personal markers are stored in this browser.',
+'Для переноса данных на другое устройство используй экспорт JSON.':'To move data to another device, export the JSON file.',
+'Для ':'For ',' целей потребуется ориентировочно ':' targets require approximately ',
+' единиц выбранного средства. При ':' units of the selected tool. With ',
+' единицах в наличии расчётный урон составит ':' units available, estimated damage is ',
+' на одну часть (до учёта распределения взрыва и дистанции).':' per part (before blast falloff and splash distribution).'
 };
 const ruToEn=Object.entries(words).sort((a,b)=>b[0].length-a[0].length);
 const enToRu=Object.entries(words).map(([a,b])=>[b,a]).sort((a,b)=>b[0].length-a[0].length);
