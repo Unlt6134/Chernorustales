@@ -1118,6 +1118,16 @@ function openTab(tabId, button) {
   if (selected) {
     selected.classList.add('active');
   }
+  if (tabId === 'map') {
+    const frame = document.querySelector('#map iframe');
+    if (frame) {
+      const notifyMap = () => frame.contentWindow?.postMessage('CT_MAP_VISIBLE', '*');
+      notifyMap();
+      frame.addEventListener('load', notifyMap, { once: true });
+      setTimeout(notifyMap, 150);
+      setTimeout(notifyMap, 500);
+    }
+  }
 
   if (button) {
     button.classList.add('active');
