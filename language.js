@@ -164,10 +164,8 @@ let b=document.getElementById('ct-lang-toggle');if(b)b.textContent=lang==='en'?'
 localStorage.setItem(KEY,lang);
 }
 function init(){
-const isMainPage=!!document.querySelector('header h1')&&document.querySelector('header h1').textContent.includes('CHERNARUS');
-if(isMainPage){
- const host=document.querySelector('header');
- const b=document.createElement('button');b.id='ct-lang-toggle';b.type='button';b.className='ct-lang-toggle';b.textContent='EN';b.setAttribute('aria-label','Switch language / Сменить язык');b.style.cssText='display:block;margin:12px auto 0;padding:7px 18px;border:1px solid #6eaa75;background:#102016;color:#b6f5a9;font:600 13px Consolas,monospace;cursor:pointer;min-width:58px;z-index:1002;box-shadow:0 0 12px #6bd27622;';host.appendChild(b);
+const b=document.getElementById('ct-lang-toggle');
+if(b){
  b.addEventListener('click',()=>apply((localStorage.getItem(KEY)||'ru')==='ru'?'en':'ru'));
 }
 apply(localStorage.getItem(KEY)||'ru');
