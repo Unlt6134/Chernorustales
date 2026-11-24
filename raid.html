@@ -105,8 +105,8 @@ const targets=[
 {id:'wire',name:'Колючая проволока',hp:300,exp:40,bullet:.01,note:'Пули наносят крайне малый урон.'},
 {id:'gate',name:'Створка ворот',hp:0,exp:0,bullet:0,note:'Непосредственно не повреждается; разрушай обе рамы.'}
 ];
-const explosives=[{name:'Plastic Explosive',damage:350},{name:'Claymore Mine',damage:100},{name:'Frag grenade (EGD-5 / 6-M7)',damage:50},{name:'40mm Explosive Grenade',damage:50},{name:'Flashbang (8-M4)',damage:5}];
-const ammo=[{name:'5.45×39 mm',damage:115},{name:'5.56×45 mm',damage:110},{name:'7.62×39 mm',damage:110},{name:'12ga slug',damage:110},{name:'.308 WIN',damage:150},{name:'7.62×54mmR',damage:150},{name:'9×39 mm',damage:75},{name:'9×19 mm',damage:40},{name:'.45 ACP',damage:40},{name:'12ga buckshot (8 pellets)',damage:280}];
+const explosives=[{name:'Пластичная взрывчатка',damage:350},{name:'Мина Клеймор',damage:100},{name:'Осколочная граната (EGD-5 / 6-M7)',damage:50},{name:'Осколочная граната 40 мм',damage:50},{name:'Светошумовая граната (8-M4)',damage:5}];
+const ammo=[{name:'Патрон 5,45×39 мм',damage:115},{name:'Патрон 5,56×45 мм',damage:110},{name:'Патрон 7,62×39 мм',damage:110},{name:'Ружейная пуля 12 калибра',damage:110},{name:'Патрон .308 WIN',damage:150},{name:'Патрон 7,62×54 мм R',damage:150},{name:'Патрон 9×39 мм',damage:75},{name:'Патрон 9×19 мм',damage:40},{name:'Патрон .45 ACP',damage:40},{name:'Картечь 12 калибра (8 дробин)',damage:280}];
 const checks={gear:['Оружие и боеприпасы','Запасной магазин','Взрывчатка и средства подрыва','Нож или инструмент','Средства защиты','Фонарь и батарейки'],survival:['Бинты / тряпки','Таблетки и антисептик','Вода и еда','Тёплая одежда','Запасной источник света'],final:['Проверить маршрут и точки отхода','Проверить состояние экипировки','Убедиться, что есть место в инвентаре','Согласовать роли и связь группы','Проверить правила и настройки сервера']};
 let state={plan:[],checks:{}};
 try{const v=JSON.parse(localStorage.getItem(STORE)||'null');if(v)state={...state,...v}}catch(e){}
