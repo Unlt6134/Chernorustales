@@ -1022,7 +1022,7 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
         </button>
 
         <button class="nav-button" onclick="openTab('dictionary', this)">
-          ▤ РАЗГОВОРНИК
+          ▤ ПРАКТИКА ВСТРЕЧ
         </button>
 
         <button class="nav-button" onclick="openTab('raidcalc', this)">
@@ -1212,26 +1212,49 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
 
         </section>
 
-        <!-- РАЗГОВОРНИК -->
-
+        <!-- ПРАКТИКА ВСТРЕЧ -->
         <section id="dictionary" class="tab-content">
-<h2 class="section-heading">Разговорник выжившего</h2>
-<p class="section-description">Фразы для общения с другими выжившими. Выбирай категорию и используй готовые выражения.</p>
-<div class="phrasebook" id="phrasebook">
-<div class="phrase-categories" role="tablist" aria-label="Категории разговорника">
-<button class="phrase-category active" data-category="all">Все фразы</button>
-<button class="phrase-category" data-category="aggression">Агрессия</button>
-<button class="phrase-category" data-category="questions">Вопросы</button>
-<button class="phrase-category" data-category="friendly">Мирный контакт</button>
-<button class="phrase-category" data-category="trade">Обмен и помощь</button>
-<button class="phrase-category" data-category="navigation">Место и направление</button>
-<button class="phrase-category" data-category="team">Командная связь</button>
-<button class="phrase-category" data-category="danger">Опасность</button>
-</div>
-<div class="phrase-list" id="phraseList" aria-live="polite"></div>
-
-</div>
-</section>
+          <h2 class="section-heading" data-ru="Практика встреч" data-en="Encounter Logs">Практика встреч</h2>
+          <p class="section-description" data-ru="Несколько записей о людях, которых я встретил на дороге. Не все встречи заканчиваются выстрелами." data-en="A handful of notes about people I met on the road. Not every encounter ends in gunfire.">Несколько записей о людях, которых я встретил на дороге. Не все встречи заканчиваются выстрелами.</p>
+          <div class="practice-catalog" id="practice-catalog">
+            <button class="history-file-button" type="button" data-practice-open="0"><span class="history-file-code">CASE_001 // ROAD STOP</span><span class="history-file-title" data-ru="Машина на обочине" data-en="Vehicle at the Roadside">Машина на обочине</span><span class="history-file-action" data-ru="ОТКРЫТЬ ЗАПИСЬ →" data-en="OPEN LOG →">ОТКРЫТЬ ЗАПИСЬ →</span></button>
+            <button class="history-file-button" type="button" data-practice-open="1"><span class="history-file-code">CASE_002 // BASEMENT</span><span class="history-file-title" data-ru="Чужой подвал" data-en="Someone Else's Basement">Чужой подвал</span><span class="history-file-action" data-ru="ОТКРЫТЬ ЗАПИСЬ →" data-en="OPEN LOG →">ОТКРЫТЬ ЗАПИСЬ →</span></button>
+            <button class="history-file-button" type="button" data-practice-open="2"><span class="history-file-code">CASE_003 // CAMPFIRE</span><span class="history-file-title" data-ru="Огонь у дороги" data-en="A Fire by the Road">Огонь у дороги</span><span class="history-file-action" data-ru="ОТКРЫТЬ ЗАПИСЬ →" data-en="OPEN LOG →">ОТКРЫТЬ ЗАПИСЬ →</span></button>
+            <button class="history-file-button" type="button" data-practice-open="3"><span class="history-file-code">CASE_004 // RADIO</span><span class="history-file-title" data-ru="Голос в эфире" data-en="A Voice on the Radio">Голос в эфире</span><span class="history-file-action" data-ru="ОТКРЫТЬ ЗАПИСЬ →" data-en="OPEN LOG →">ОТКРЫТЬ ЗАПИСЬ →</span></button>
+          </div>
+          <div id="practice-records">
+            <article class="practice-record" data-practice-record="0" hidden>
+              <button type="button" class="history-file-back" data-practice-back><span data-ru="← К СПИСКУ ЗАПИСЕЙ" data-en="← BACK TO LOGS">← К СПИСКУ ЗАПИСЕЙ</span></button>
+              <div class="archive-file-tag">CASE_001 // ROAD STOP</div><div class="history-era-date" data-ru="ЗАПИСЬ · ПОЗДНИЙ ВЕЧЕР" data-en="LOG · LATE EVENING">ЗАПИСЬ · ПОЗДНИЙ ВЕЧЕР</div>
+              <h3 data-ru="Машина на обочине" data-en="Vehicle at the Roadside">Машина на обочине</h3>
+              <p class="entry-voice" data-ru="Я услышал двигатель раньше, чем увидел фары. Старая машина остановилась поперёк дороги, и трое незнакомцев жестом велели мне подойти. Я решил, что они предлагают подвезти меня до следующего посёлка. Ошибся." data-en="I heard the engine before I saw the headlights. An old car stopped across the road, and three strangers gestured for me to come closer. I thought they were offering a ride to the next settlement. I was wrong.">Я услышал двигатель раньше, чем увидел фары. Старая машина остановилась поперёк дороги, и трое незнакомцев жестом велели мне подойти. Я решил, что они предлагают подвезти меня до следующего посёлка. Ошибся.</p>
+              <p data-ru="Меня усадили внутрь и отвезли к заброшенному дому. В подвале задавали вопросы: откуда я пришёл, кого видел, что нёс в рюкзаке. Один из них всё время повторял, что им нужна только информация. Я не знал, верить ли ему." data-en="They forced me into the car and drove to an abandoned house. In the cellar they questioned me: where I had come from, whom I had seen, what was in my pack. One kept saying they only wanted information. I couldn't tell whether to believe him.">Меня усадили внутрь и отвезли к заброшенному дому. В подвале задавали вопросы: откуда я пришёл, кого видел, что нёс в рюкзаке. Один из них всё время повторял, что им нужна только информация. Я не знал, верить ли ему.</p>
+              <p data-ru="Когда снаружи хлопнула дверь, двое вышли проверить шум. Я воспользовался короткой паузой, выбрался через узкое окно и бежал, пока не перестал слышать их голоса. До рассвета я не останавливался." data-en="When a door slammed upstairs, two of them went to check. I used the brief pause, slipped through a narrow window and ran until their voices faded. I didn't stop until dawn.">Когда снаружи хлопнула дверь, двое вышли проверить шум. Я воспользовался короткой паузой, выбрался через узкое окно и бежал, пока не перестал слышать их голоса. До рассвета я не останавливался.</p>
+            </article>
+            <article class="practice-record" data-practice-record="1" hidden>
+              <button type="button" class="history-file-back" data-practice-back><span data-ru="← К СПИСКУ ЗАПИСЕЙ" data-en="← BACK TO LOGS">← К СПИСКУ ЗАПИСЕЙ</span></button>
+              <div class="archive-file-tag">CASE_002 // BASEMENT</div><div class="history-era-date" data-ru="ЗАПИСЬ · ДОЖДЛИВЫЙ ДЕНЬ" data-en="LOG · RAINY DAY">ЗАПИСЬ · ДОЖДЛИВЫЙ ДЕНЬ</div>
+              <h3 data-ru="Чужой подвал" data-en="Someone Else's Basement">Чужой подвал</h3>
+              <p class="entry-voice" data-ru="Я укрылся от дождя в доме на окраине. На лестнице вниз лежали свежие следы, а из подвала доносился тихий разговор. Я уже собирался уйти, когда дверь наверху захлопнулась. Кто-то запер её снаружи." data-en="I took shelter from the rain in a house on the outskirts. Fresh tracks led downstairs, and quiet voices came from the cellar. I was about to leave when the door above slammed shut. Someone had locked it from outside.">Я укрылся от дождя в доме на окраине. На лестнице вниз лежали свежие следы, а из подвала доносился тихий разговор. Я уже собирался уйти, когда дверь наверху захлопнулась. Кто-то запер её снаружи.</p>
+              <p data-ru="Там были двое. Они не стали стрелять, но потребовали оставить рюкзак и объяснить, почему я вошёл. Я поставил вещи на пол. Пока они спорили, я заметил запасной выход за стеллажом — старый технический проход, заваленный досками." data-en="There were two people inside. They didn't shoot, but demanded my pack and an explanation for entering. I set my gear down. While they argued, I noticed a second exit behind a shelf—an old service passage partly blocked with boards.">Там были двое. Они не стали стрелять, но потребовали оставить рюкзак и объяснить, почему я вошёл. Я поставил вещи на пол. Пока они спорили, я заметил запасной выход за стеллажом — старый технический проход, заваленный досками.</p>
+              <p data-ru="Мы разошлись без рукопожатия. Они оставили мне воду, я — часть еды. Не знаю, было ли это примирением или просто обменом, после которого никто не захотел продолжать разговор." data-en="We parted without a handshake. They left me water; I left them some food. I don't know if it was reconciliation or simply a trade after which neither side wanted to talk further.">Мы разошлись без рукопожатия. Они оставили мне воду, я — часть еды. Не знаю, было ли это примирением или просто обменом, после которого никто не захотел продолжать разговор.</p>
+            </article>
+            <article class="practice-record" data-practice-record="2" hidden>
+              <button type="button" class="history-file-back" data-practice-back><span data-ru="← К СПИСКУ ЗАПИСЕЙ" data-en="← BACK TO LOGS">← К СПИСКУ ЗАПИСЕЙ</span></button>
+              <div class="archive-file-tag">CASE_003 // CAMPFIRE</div><div class="history-era-date" data-ru="ЗАПИСЬ · НОЧЬ" data-en="LOG · NIGHT">ЗАПИСЬ · НОЧЬ</div>
+              <h3 data-ru="Огонь у дороги" data-en="A Fire by the Road">Огонь у дороги</h3>
+              <p class="entry-voice" data-ru="За поворотом я увидел слабый свет костра. У огня сидел человек с перевязанной рукой. Он поднял ладонь, показывая, что оружие у него опущено, и спросил, есть ли у меня бинт. Я долго не отвечал — слишком много раз добрые слова оказывались приманкой." data-en="Around the bend I saw the faint glow of a fire. A person sat beside it with an injured arm. He raised an open hand, keeping his weapon lowered, and asked if I had a bandage. I hesitated; too many times, friendly words had been bait.">За поворотом я увидел слабый свет костра. У огня сидел человек с перевязанной рукой. Он поднял ладонь, показывая, что оружие у него опущено, и спросил, есть ли у меня бинт. Я долго не отвечал — слишком много раз добрые слова оказывались приманкой.</p>
+              <p data-ru="Я бросил бинт рядом и отошёл на несколько шагов. Он обработал рану, а затем оставил у камня половину банки еды. Мы не спросили имён и не стали идти вместе. Иногда короткая помощь — всё, на что способны незнакомцы." data-en="I tossed him a bandage and stepped back. He treated the wound, then left half a can of food by a stone. We exchanged no names and didn't travel together. Sometimes a brief act of help is all strangers can manage.">Я бросил бинт рядом и отошёл на несколько шагов. Он обработал рану, а затем оставил у камня половину банки еды. Мы не спросили имён и не стали идти вместе. Иногда короткая помощь — всё, на что способны незнакомцы.</p>
+            </article>
+            <article class="practice-record" data-practice-record="3" hidden>
+              <button type="button" class="history-file-back" data-practice-back><span data-ru="← К СПИСКУ ЗАПИСЕЙ" data-en="← BACK TO LOGS">← К СПИСКУ ЗАПИСЕЙ</span></button>
+              <div class="archive-file-tag">CASE_004 // RADIO</div><div class="history-era-date" data-ru="ЗАПИСЬ · НЕИЗВЕСТНОЕ ВРЕМЯ" data-en="LOG · TIME UNKNOWN">ЗАПИСЬ · НЕИЗВЕСТНОЕ ВРЕМЯ</div>
+              <h3 data-ru="Голос в эфире" data-en="A Voice on the Radio">Голос в эфире</h3>
+              <p class="entry-voice" data-ru="Старый приёмник ожил среди помех. Мужчина назвал перекрёсток и попросил не подходить к дороге с востока. За его словами слышались шаги и металлический скрежет. Я спросил, нужна ли помощь, но ответ пришёл не сразу." data-en="An old receiver came alive through the static. A man named a crossroads and warned us not to approach from the east. Footsteps and a metallic scrape sounded behind his words. I asked if he needed help, but the reply came late.">Старый приёмник ожил среди помех. Мужчина назвал перекрёсток и попросил не подходить к дороге с востока. За его словами слышались шаги и металлический скрежет. Я спросил, нужна ли помощь, но ответ пришёл не сразу.</p>
+              <p data-ru="«Не ищи меня», — сказал он наконец. Потом эфир замолчал. Я отметил перекрёсток на карте и обошёл его стороной. Возможно, он пытался предупредить меня. Возможно, хотел, чтобы я пришёл. В таких местах разница иногда выясняется слишком поздно." data-en="“Don't look for me,” he finally said. Then the signal went silent. I marked the crossroads and took another route. Maybe he was trying to warn me. Maybe he wanted me to come. In places like this, the difference can become clear too late.">«Не ищи меня», — сказал он наконец. Потом эфир замолчал. Я отметил перекрёсток на карте и обошёл его стороной. Возможно, он пытался предупредить меня. Возможно, хотел, чтобы я пришёл. В таких местах разница иногда выясняется слишком поздно.</p>
+            </article>
+          </div>
+        </section>
 
         <!-- ШПАРГАЛКА -->
 
@@ -1507,6 +1530,16 @@ updateArchiveLanguage();
 </style>
 <script>
 (()=>{const root=document.getElementById('home'),catalog=root?.querySelector('#classified-file-catalog'),docs=[...root.querySelectorAll('[data-classified-document]')];if(!catalog||docs.length!==4||catalog.dataset.bound)return;catalog.dataset.bound='1';let y=0;const back=()=>{docs.forEach(d=>d.hidden=true);catalog.hidden=false;requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'smooth'}));};catalog.querySelectorAll('[data-classified-open]').forEach(btn=>btn.addEventListener('click',()=>{const n=Number(btn.dataset.classifiedOpen);if(!docs[n])return;y=window.scrollY;catalog.hidden=true;docs.forEach((d,i)=>d.hidden=i!==n);docs[n].scrollIntoView({behavior:'smooth',block:'start'});}));root.querySelectorAll('[data-classified-back]').forEach(btn=>btn.addEventListener('click',back));})();
+</script>
+
+<style id="practice-encounter-style">
+#dictionary .practice-catalog{display:grid;grid-template-columns:1fr;gap:10px;margin:18px 0}
+#dictionary .practice-record[hidden],#dictionary .practice-catalog[hidden]{display:none!important}
+#dictionary .practice-record{margin-top:16px}
+#dictionary .practice-record .entry-voice{color:var(--green);font-style:italic}
+</style>
+<script>
+(()=>{const root=document.getElementById('dictionary'),catalog=root?.querySelector('#practice-catalog'),records=[...root.querySelectorAll('[data-practice-record]')];if(!catalog||records.length!==4||root.dataset.practiceReady)return;root.dataset.practiceReady='1';let savedY=0;catalog.querySelectorAll('[data-practice-open]').forEach(btn=>btn.addEventListener('click',()=>{const index=Number(btn.dataset.practiceOpen);if(!records[index])return;savedY=window.scrollY;catalog.hidden=true;records.forEach((r,i)=>r.hidden=i!==index);records[index].scrollIntoView({behavior:'smooth',block:'start'});}));root.querySelectorAll('[data-practice-back]').forEach(btn=>btn.addEventListener('click',()=>{records.forEach(r=>r.hidden=true);catalog.hidden=false;requestAnimationFrame(()=>window.scrollTo({top:savedY,behavior:'smooth'}));}));})();
 </script>
 </body>
 </html>
