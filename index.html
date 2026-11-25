@@ -1388,8 +1388,9 @@ updateArchiveLanguage();
  function initArchiveReader(){
   const home=document.getElementById('home'),menu=document.getElementById('archive-menu');
   if(!home||!menu||menu.dataset.ready==='1')return;
-  const files=[...home.querySelectorAll('.archive-files > .archive-file')];
-  if(files.length!==4)return;
+  const files=[...home.querySelectorAll('.archive-files > .archive-file')].filter(file=>!file.classList.contains('survival-topic-detail'));
+  // Внутренние досье выживания тоже имеют .archive-file, но не являются пунктами главного меню.
+  if(files.length<4)return;
   menu.dataset.ready='1';
   files.forEach(file=>{
    const back=document.createElement('button');
