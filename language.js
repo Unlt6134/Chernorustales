@@ -322,7 +322,7 @@ function translateText(text,lang){let out=text;for(const [from,to] of (lang==='e
 const originals=new WeakMap();
 function translateNode(node,lang){
  if(!node||node.nodeType!==Node.TEXT_NODE)return;
- if(node.parentElement?.closest('[data-ct-fixed-en]'))return;
+ if(node.parentElement?.closest('[data-ct-fixed-en],[data-ru][data-en]'))return;
  let record=originals.get(node);
  if(!record){record={original:node.nodeValue,last:node.nodeValue};originals.set(node,record)}
  else if(node.nodeValue!==record.last){record.original=node.nodeValue}
@@ -338,6 +338,7 @@ function translateTree(root,lang){
 function apply(lang){
 lang=lang==='en'?'en':'ru';document.documentElement.lang=lang;
 translateTree(document.body,lang);
+document.querySelectorAll('[data-ru][data-en]').forEach(el=>{el.textContent=lang==='en'?el.getAttribute('data-en'):el.getAttribute('data-ru')});
 document.title=translateText(document.title,lang);
 const description=document.querySelector('meta[name="description"]');if(description){if(!description.dataset.ctOriginal)description.dataset.ctOriginal=description.content;description.content=translateText(description.dataset.ctOriginal,lang)}
 document.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el=>['placeholder','title','aria-label'].forEach(attr=>{const v=el.getAttribute(attr);if(v)el.setAttribute(attr,translateText(v,lang))}));
