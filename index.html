@@ -1451,5 +1451,25 @@ updateArchiveLanguage();
 }
 
 </style>
+
+<style id="survival-text-size-hard-fix">
+/* Match compact archive prose; scoped directly to topic article elements */
+article.survival-topic-detail[data-topic-detail] p,
+article.survival-topic-detail[data-topic-detail] li {
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 9px !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+  word-spacing: 0 !important;
+  font-weight: 400 !important;
+}
+@media (max-width: 600px) {
+  article.survival-topic-detail[data-topic-detail] p,
+  article.survival-topic-detail[data-topic-detail] li {
+    font-size: 9px !important;
+    line-height: 1.55 !important;
+  }
+}
+</style>
 </body>
 </html>
