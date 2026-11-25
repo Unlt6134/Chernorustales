@@ -41,10 +41,13 @@
     .btn-accent:hover { background: var(--accent-hover); }
   
 
-/* Единый размер шрифта на всём сайте */
-html, body, body * {
-  font-size: 14px !important;
+/* Типографика: сохраняем исходные размеры, выравниваем интервалы */
+body { line-height: 1.5; }
+p, li, label, .section-description, .info-card p, .terminal-box {
+  line-height: 1.55;
 }
+h1, h2, h3, h4, .section-heading { line-height: 1.2; }
+p { margin-block: 0.65em; }
 </style>
 </head>
 <body>
