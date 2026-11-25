@@ -1416,7 +1416,9 @@ updateArchiveLanguage();
  root.dataset.survivalTopicsReady='1';
  const grid=root.querySelector('#survival-topics'),details=root.querySelector('#survival-topic-details');
  if(!grid||!details)return;
+ let returnScrollY=0;
  grid.querySelectorAll('[data-topic]').forEach(btn=>btn.addEventListener('click',()=>{
+  returnScrollY=window.scrollY;
   const id=btn.dataset.topic;
   grid.hidden=true;details.hidden=false;
   details.querySelectorAll('[data-topic-detail]').forEach(panel=>panel.hidden=panel.dataset.topicDetail!==id);
@@ -1424,7 +1426,7 @@ updateArchiveLanguage();
  }));
  details.querySelectorAll('.survival-topic-back').forEach(btn=>btn.addEventListener('click',()=>{
   details.hidden=true;grid.hidden=false;
-  grid.scrollIntoView({behavior:'smooth',block:'start'});
+  requestAnimationFrame(()=>window.scrollTo({top:returnScrollY,behavior:'smooth'}));
  }));
 })();
 </script>
