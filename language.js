@@ -343,7 +343,8 @@ const description=document.querySelector('meta[name="description"]');if(descript
 document.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el=>['placeholder','title','aria-label'].forEach(attr=>{const v=el.getAttribute(attr);if(v)el.setAttribute(attr,translateText(v,lang))}));
 let b=document.getElementById('ct-lang-toggle');if(b)b.textContent=lang==='en'?'RU':'EN';
 localStorage.setItem(KEY,lang);
-window.dispatchEvent(new CustomEvent('ct-language-change',{detail:{lang}}));\n document.querySelectorAll('iframe').forEach(frame=>{try{frame.contentWindow.postMessage({type:'ct-language-change',lang},'*')}catch(_){}});
+window.dispatchEvent(new CustomEvent('ct-language-change',{detail:{lang}}));
+ document.querySelectorAll('iframe').forEach(frame=>{try{frame.contentWindow.postMessage({type:'ct-language-change',lang},'*')}catch(_){}});
 }
 function init(){
 apply(localStorage.getItem(KEY)||'ru');
