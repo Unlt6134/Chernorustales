@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#080e09">
 <meta name="description" content="CHERNARUS TALES — архив выжившего, тактическая карта и база знаний DayZ.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="CHERNARUS TALES — Military Archive">
+<meta property="og:description" content="Архив выжившего: лор Черноруси, советы по DayZ, тактическая карта и разговорник.">
+<meta name="twitter:card" content="summary">
 <title>CHERNARUS TALES — Military Archive</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,6 +56,23 @@ body {
 button {
   font: inherit;
 }
+
+/* Видимый клавиатурный фокус и быстрый доступ к содержимому */
+:focus-visible {
+  outline: 2px solid var(--bright);
+  outline-offset: 3px;
+}
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: 8px;
+  left: 8px;
+  padding: 10px 14px;
+  color: #061007;
+  background: var(--bright);
+  transform: translateY(-160%);
+}
+.skip-link:focus { transform: translateY(0); }
 
 /* Фоновая атмосфера */
 
@@ -905,6 +926,7 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
 </head>
 
 <body>
+<a class="skip-link" href="#main-content">Перейти к содержимому</a>
 
 <div class="background-grid"></div>
 
@@ -969,7 +991,7 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
         </button>
       </nav>
 
-      <main>
+      <main id="main-content" tabindex="-1">
 
         <!-- ГЛАВНАЯ -->
 
