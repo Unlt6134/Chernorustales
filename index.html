@@ -898,10 +898,13 @@ html,body,button,input,select,textarea{font-family:"Courier New",monospace!impor
 @media(max-width:600px){#home .survival-topic-detail{padding:17px 15px!important}#home .survival-topic-detail p,#home .survival-topic-detail li{font-size:15px!important;line-height:1.68!important}#home .survival-topic-detail h4{font-size:24px!important}#home .survival-topic-detail h5{font-size:19px!important}}
 
 
-/* Единый размер шрифта на всём сайте */
-html, body, body * {
-  font-size: 14px !important;
+/* Типографика: сохраняем исходные размеры, выравниваем интервалы */
+body { line-height: 1.5; }
+p, li, label, .section-description, .info-card p, .terminal-box {
+  line-height: 1.55;
 }
+h1, h2, h3, h4, .section-heading { line-height: 1.2; }
+p { margin-block: 0.65em; }
 </style>
 <style>
       .ct-lang-toggle{display:inline-block!important;position:relative;z-index:20;margin:14px auto 4px;padding:8px 20px;min-width:64px;border:1px solid #78c982;border-radius:3px;background:#102016;color:#c2ffc2;font:700 13px Consolas,monospace;letter-spacing:1px;cursor:pointer;box-shadow:0 0 14px rgba(107,210,118,.18)}
