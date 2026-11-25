@@ -346,6 +346,7 @@ localStorage.setItem(KEY,lang);
 window.dispatchEvent(new CustomEvent('ct-language-change',{detail:{lang}}));
  document.querySelectorAll('iframe').forEach(frame=>{try{frame.contentWindow.postMessage({type:'ct-language-change',lang},'*')}catch(_){}});
 }
+window.ctApplyLanguage=apply;
 function init(){
 apply(localStorage.getItem(KEY)||'ru');
 document.addEventListener('click',e=>{
