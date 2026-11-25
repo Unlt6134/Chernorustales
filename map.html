@@ -45,12 +45,17 @@ iframe{display:block;width:100%;height:100%;height:100dvh;border:0;background:#1
 <footer class="notice" id="notice">Источник карты: iZurvive — <a href="https://www.izurvive.com/chernarusplus/" target="_blank" rel="noopener noreferrer">izurvive.com</a>. Карта и её обозначения принадлежат соответствующим правообладателям; отображаются оригинальные материалы и атрибуция источника.</footer>
 <script>
 (function(){
+  function refreshLanguage(){
   const en=localStorage.getItem('ct_language')==='en';
   document.documentElement.lang=en?'en':'ru';
   document.getElementById('brand').textContent=en?'CHERNARUS TALES // MAP':'CHERNARUS TALES // КАРТА';
   document.getElementById('source').innerHTML=en?'Map source: iZurvive<br>DayZ / Bohemia Interactive':'Карта: iZurvive<br>DayZ / Bohemia Interactive';
   document.getElementById('openMap').textContent=en?'OPEN iZURVIVE ↗':'ОТКРЫТЬ iZURVIVE ↗';
   document.getElementById('notice').innerHTML=en?'Map source: iZurvive — <a href="https://www.izurvive.com/chernarusplus/" target="_blank" rel="noopener noreferrer">izurvive.com</a>. Map artwork and labels belong to their respective rights holders; original map content and attribution are retained.':'Источник карты: iZurvive — <a href="https://www.izurvive.com/chernarusplus/" target="_blank" rel="noopener noreferrer">izurvive.com</a>. Карта и её обозначения принадлежат соответствующим правообладателям; отображаются оригинальные материалы и атрибуция источника.';
+  }
+  refreshLanguage();
+  window.addEventListener('message',e=>{if(e.data&&e.data.type==='ct-language-change')refreshLanguage()});
+  window.addEventListener('storage',e=>{if(e.key==='ct_language')refreshLanguage()});
 })();
 </script>
 </body>
