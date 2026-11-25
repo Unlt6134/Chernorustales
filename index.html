@@ -1430,6 +1430,26 @@ updateArchiveLanguage();
   #home .survival-topic-card .archive-menu-title { font-size: 20px !important; }
 }
 
+
+/* Match survival article body copy to the established History archive typography */
+#home .survival-topic-detail p,
+#home .survival-topic-detail li {
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 12px !important;
+  line-height: 1.48 !important;
+  color: var(--muted) !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  margin: 8px 0 !important;
+}
+@media (max-width: 600px) {
+  #home .survival-topic-detail p,
+  #home .survival-topic-detail li {
+    font-size: 12px !important;
+    line-height: 1.48 !important;
+  }
+}
+
 </style>
 </body>
 </html>
