@@ -1,63 +1,396 @@
-<!doctype html>
+ <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07110a">
-<title>Карта Чернаруси // CHERNARUS TALES</title>
-<style>
-:root{color-scheme:dark;--g:#9ed6a2;--bg:#07110a;--panel:#101d14;--line:#34563a;--muted:#9aab9c}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:#d0ded1;font:13px "Courier New",monospace}
-body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-.top{min-height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;background:#0b170e;border-bottom:1px solid var(--line);color:var(--g)}
-.brand{font-size:11px;letter-spacing:1.2px;font-weight:bold;white-space:nowrap}
-.actions{display:flex;align-items:center;gap:12px;min-width:0}
-.source{font-size:10px;color:var(--muted);text-align:right;line-height:1.45}
-a{color:var(--g);text-decoration:none}
-a:hover{text-decoration:underline}
-.open{border:1px solid var(--line);padding:8px 11px;background:#142319;color:var(--g);font:11px "Courier New";white-space:nowrap;border-radius:3px}
-.map{position:relative;flex:1;min-height:0;background:#101810;overflow:hidden}
-iframe{display:block;width:100%;height:100%;height:100dvh;border:0;background:#101810;color-scheme:dark}
-.notice{flex:none;padding:7px 12px;border-top:1px solid var(--line);background:#0b170e;color:#91a493;font-size:10px;line-height:1.4}
-@media(max-width:640px){
- .top{min-height:52px;padding:7px 10px;gap:8px}
- .brand{font-size:10px;letter-spacing:.65px;max-width:48%;white-space:normal;line-height:1.35}
- .actions{gap:7px}
- .source{display:none}
- .open{padding:9px 10px;font-size:10px;min-height:36px}
- .notice{padding:5px 9px;font-size:9px;line-height:1.3}
-}
-@media(max-width:360px){.brand{font-size:9px}.open{font-size:9px;padding:8px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CHERNARUS TALES — Тактический навигатор</title>
+  <style>
+    :root {
+      --bg-dark: #0b100d;
+      --bg-card: #151d17;
+      --accent: #a83232;
+      --accent-hover: #c93b3b;
+      --text-main: #e2e6e3;
+      --text-muted: #8c9690;
+      --border: #34483a;
+    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; height: 100dvh; background: var(--bg-dark); overflow: hidden; color: var(--text-main); }\n    body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+    .menu-btn { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 12px; z-index: 30; background: rgba(24, 28, 26, 0.95); color: var(--text-main); border: 1px solid var(--border); padding: 9px 14px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.6); letter-spacing: 0.5px; }
+    .menu-btn:hover { border-color: var(--accent); color: #fff; }
+    .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 84vw; z-index: 40; background: var(--bg-card); border-right: 1px solid var(--border); padding: 16px; transform: translateX(-105%); transition: transform 0.25s ease; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-head { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding-bottom: 10px; border-bottom: 1px solid var(--border); color: #fff; }
+    .close-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+    .layer-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #111412; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); color: var(--text-muted); }
+    .layer-item.active { border-color: var(--accent); color: #fff; background: #1f1717; }
+    .bottom-hud { position: fixed; bottom: calc(10px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 560px; z-index: 20; background: rgba(24, 28, 26, 0.96); padding: 12px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 8px 30px rgba(0,0,0,0.75); }
+    .supplies { display: flex; gap: 8px; margin-bottom: 8px; }
+    .sup-box { flex: 1; background: #111412; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border); }
+    .sup-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: block; margin-bottom: 3px; }
+    select, input { width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-main); padding: 5px; border-radius: 4px; font-size: 12px; font-weight: 600; outline: none; }
+    .stat-card { background: #111412; border-radius: 6px; padding: 8px 10px; border-left: 4px solid var(--accent); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: 12px; }
+    .stat-grid { display: flex; justify-content: space-between; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border); text-align: center; }
+    .stat-val { font-size: 14px; font-weight: 800; display: block; color: #fff; }
+    .stat-sub { font-size: 10px; color: var(--text-muted); }
+    .btn-row { display: flex; gap: 6px; margin-top: 8px; }
+    .btn { flex: 1; padding: 8px 6px; border: 1px solid var(--border); border-radius: 5px; font-size: 12px; font-weight: 700; color: var(--text-main); background: #111412; cursor: pointer; transition: 0.15s; }
+    .btn:hover { border-color: var(--accent); color: #fff; }
+    .btn-accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-accent:hover { background: var(--accent-hover); }
+  \n    .nav-search{position:fixed;z-index:25;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(430px,calc(100% - 190px));display:flex;gap:6px;padding:6px;background:rgba(16,25,18,.96);border:1px solid var(--border);border-radius:7px;box-shadow:0 5px 18px #0008}.nav-search input{min-width:0;flex:1;padding:8px 10px}.nav-search .btn{flex:0 0 auto;margin:0;padding:7px 10px}\n    @media(max-width:600px){.nav-search{top:calc(58px + env(safe-area-inset-top));left:10px;transform:none;width:calc(100% - 20px);max-width:none}.menu-btn{top:calc(10px + env(safe-area-inset-top));left:10px;padding:9px 10px}.bottom-hud{width:calc(100% - 16px);bottom:calc(7px + env(safe-area-inset-bottom));padding:9px}.drawer{padding-top:calc(14px + env(safe-area-inset-top));}.sup-label{font-size:9px}.btn{min-height:36px}.stat-val{font-size:12px}}\n</style>
 </head>
 <body>
-<header class="top">
-  <div class="brand" id="brand">CHERNARUS TALES // КАРТА</div>
-  <div class="actions">
-    <div class="source" id="source">Карта: iZurvive<br>DayZ / Bohemia Interactive</div>
-    <a class="open" id="openMap" href="https://www.izurvive.com/chernarusplus/" target="_blank" rel="noopener noreferrer">ОТКРЫТЬ iZURVIVE ↗</a>
+<button class="menu-btn" onclick="toggleDrawer()">☰ СЛОИ КАРТЫ</button>
+<div class="drawer" id="drawer">
+  <div class="drawer-head"><span>Фильтр объектов</span><button class="close-btn" onclick="toggleDrawer()">✕</button></div>
+  <div class="layer-item active" id="l-city" onclick="toggleLayer('city')"><span>🏙 Города и посёлки</span><span id="st-city">ВКЛ</span></div>
+  <div class="layer-item active" id="l-mil" onclick="toggleLayer('mil')"><span>🪖 Военные базы / КПП</span><span id="st-mil">ВКЛ</span></div>
+  <div class="layer-item active" id="l-camp" onclick="toggleLayer('camp')"><span>🏕 Турбазы и замки</span><span id="st-camp">ВКЛ</span></div>
+  <div class="layer-item active" id="l-water" onclick="toggleLayer('water')"><span>💧 Колонки с водой</span><span id="st-water">ВКЛ</span></div>
+  <div class="layer-item active" id="l-police" onclick="toggleLayer('police')"><span>🚓 Полицейские участки</span><span id="st-police">ВКЛ</span></div>
+  <div class="layer-item active" id="l-med" onclick="toggleLayer('med')"><span>🏥 Больницы и медпункты</span><span id="st-med">ВКЛ</span></div>
+
+  <div style="border-top:1px solid var(--border); padding-top:8px; margin-top:2px;">
+    <div style="font-size:11px; font-weight:700; color:#d4a359; margin-bottom:4px;">Калибровка сетки (<span id="cal-val">0, 0</span>)</div>
+    <div class="btn-row" style="margin-top:0;">
+      <button class="btn" onclick="shiftCal(-4,0)">◀</button>
+      <button class="btn" onclick="shiftCal(4,0)">▶</button>
+      <button class="btn" onclick="shiftCal(0,-4)">▲</button>
+      <button class="btn" onclick="shiftCal(0,4)">▼</button>
+      <button class="btn btn-accent" onclick="resetCal()">0</button>
+    </div>
   </div>
-</header>
-<main class="map">
-  <iframe id="izurvive" src="https://www.izurvive.com/chernarusplus/" title="Интерактивная карта Чернаруси iZurvive" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen; geolocation" style="color-scheme:dark"></iframe>
-</main>
-<footer class="notice" id="notice">Источник карты: iZurvive — <a href="https://www.izurvive.com/chernarusplus/" target="_blank" rel="noopener noreferrer">izurvive.com</a>. Карта и её обозначения принадлежат соответствующим правообладателям; отображаются оригинальные материалы и атрибуция источника.</footer>
+
+  <div style="border-top:1px solid var(--border); padding-top:8px;">
+    <div style="font-size:11px; font-weight:700; color:#d4a359; margin-bottom:6px;">Добавить свою метку</div>
+    <select id="pin-type" style="margin-bottom:6px;"><option value="water">💧 Колонка с водой</option><option value="police">🚓 Полицейский участок</option><option value="med">🏥 Больница / Медпункт</option><option value="mil">🪖 Военный объект</option><option value="camp">🏕 Охотничий лагерь</option><option value="city">🏙 Деревня / Город</option></select>
+    <input type="text" id="pin-name" placeholder="Подпись (необязательно)" style="margin-bottom:6px;">
+    <button class="btn" id="pin-mode-btn" style="width:100%;" onclick="togglePinMode()">Установка меток: ВЫКЛ</button>
+  </div>
+</div>
+<div class="nav-search" role="search"><input id="poi-search" list="poi-list" placeholder="Найти город / объект…" autocomplete="off"><datalist id="poi-list"></datalist><button class="btn btn-accent" onclick="searchPoi()">НАЙТИ</button></div>\n<canvas id="mapCanvas"></canvas>
+<div class="bottom-hud">
+  <div class="supplies">
+    <div class="sup-box"><span class="sup-label">Еда (Яблоко)</span><select id="food" onchange="updateStats()"><option value="95">⚪ Белое (100%)</option><option value="55" selected>⚪ Белое (50%)</option><option value="25">🟡 Жёлтое</option><option value="10">🔴 Красное</option></select></div>
+    <div class="sup-box"><span class="sup-label">Вода (Бутылка)</span><select id="water" onchange="updateStats()"><option value="95">⚪ Белая (100%)</option><option value="55" selected>⚪ Белая (50%)</option><option value="25">🟡 Жёлтая</option><option value="10">🔴 Красная</option></select></div>
+  </div>
+  <div id="info-box" style="font-size:12px; color:var(--text-muted); text-align:center; padding:3px 0;">Кликните по карте для старта (А), затем по поворотам маршрута.</div>
+  <div class="btn-row">
+    <button class="btn" onclick="resetView()">Вся карта</button>
+    <button class="btn" onclick="undoPoint()">↩ Шаг назад</button>
+    <button class="btn btn-accent" onclick="clearRoute()">Сбросить</button>
+  </div>
+</div>
 <script>
-(function(){
-  function refreshLanguage(){
-  const en=localStorage.getItem('ct_language')==='en';
-  document.documentElement.lang=en?'en':'ru';
-  document.getElementById('brand').textContent=en?'CHERNARUS TALES // MAP':'CHERNARUS TALES // КАРТА';
-  document.getElementById('source').innerHTML=en?'Map source: iZurvive<br>DayZ / Bohemia Interactive':'Карта: iZurvive<br>DayZ / Bohemia Interactive';
-  document.getElementById('openMap').textContent=en?'OPEN iZURVIVE ↗':'ОТКРЫТЬ iZURVIVE ↗';
-  document.getElementById('notice').innerHTML=en?'Map source: iZurvive — <a href="https://www.izurvive.com/chernarusplus/" target="_blank" rel="noopener noreferrer">izurvive.com</a>. Map artwork and labels belong to their respective rights holders; original map content and attribution are retained.':'Источник карты: iZurvive — <a href="https://www.izurvive.com/chernarusplus/" target="_blank" rel="noopener noreferrer">izurvive.com</a>. Карта и её обозначения принадлежат соответствующим правообладателям; отображаются оригинальные материалы и атрибуция источника.';
+const MAP_FILE = 'map.webp';
+const REAL_METERS = 15360;
+const BORDER = 28;
+
+const rawDb = [
+  ["Черногорск", 6550, 2480, "city", 9], ["Электрозаводск", 10320, 2180, "city", 9],
+  ["Камышово", 12050, 3540, "city", 6], ["Солнечный", 13350, 6220, "city", 5],
+  ["Нижнее", 12950, 8150, "city", 4], ["Березино", 12920, 10080, "city", 9],
+  ["Светлоярск", 13920, 13250, "city", 6], ["Новодмитровск", 11450, 14450, "city", 7],
+  ["Североград", 8420, 12720, "city", 6], ["Новая Петровка", 3450, 12980, "city", 5],
+  ["Выбор", 3820, 8920, "city", 7], ["Кабанино", 5320, 8580, "city", 5],
+  ["Старый Собор", 6080, 7750, "city", 8], ["Новый Собор", 7120, 7680, "city", 5],
+  ["Горка", 9520, 8820, "city", 6], ["Поляна", 10720, 8120, "city", 4],
+  ["Долина", 11250, 6580, "city", 3], ["Старое", 10150, 5450, "city", 3],
+  ["Могилёвка", 7550, 5120, "city", 3], ["Надеждино", 5850, 4750, "city", 3],
+  ["Зеленогорск", 2720, 5280, "city", 8], ["Пустошка", 3080, 7950, "city", 4],
+  ["Сосновка", 2520, 6420, "city", 3], ["Комарово", 3650, 2450, "city", 4],
+  ["Каменка", 1880, 2220, "city", 4], ["Красностав", 11180, 12250, "city", 5],
+  ["Гвоздно", 8620, 11850, "city", 4], ["Гришино", 5950, 10320, "city", 5],
+  ["Синисток", 1480, 11950, "city", 3], ["Топольники", 2850, 12350, "city", 4],
+
+  ["СЗ Аэро (NWAF)", 4520, 10250, "mil", 10], ["Тисы (Военка)", 1680, 14050, "mil", 10],
+  ["Павлово (База)", 2150, 3380, "mil", 9], ["Балота (Аэро)", 4750, 2420, "mil", 8],
+  ["Троицкое (База)", 7880, 14680, "mil", 9], ["Каменск (Военка)", 7120, 14120, "mil", 8],
+  ["ВМЦ (VMC)", 4520, 8320, "mil", 9], ["Зелёная Гора", 3720, 6010, "mil", 7],
+  ["Мышкино (Палатки)", 1180, 7250, "mil", 8], ["КПП Старый Собор", 6350, 7780, "mil", 7],
+
+  ["Лагерь Арсеново", 8520, 13920, "camp", 4], ["Лагерь Металлург", 1080, 6620, "camp", 4],
+  ["Лагерь Романтика", 13450, 11680, "camp", 4], ["Лагерь Надежда", 7220, 3980, "camp", 3],
+  ["Лагерь Пруды", 6580, 9320, "camp", 4], ["Лагерь Дружба", 11420, 10680, "camp", 4],
+  ["Замок Дьявола", 6890, 11420, "camp", 4], ["Замок Зуб", 6530, 5590, "camp", 3],
+  ["Замок Рог", 11250, 4290, "camp", 3], ["Замок Крона", 1380, 9250, "camp", 3],
+
+  ["Колонка", 12055, 3575, "water", 0], ["Колонка", 13370, 6235, "water", 0],
+  ["Колонка", 11285, 6560, "water", 0], ["Колонка", 10135, 5435, "water", 0],
+  ["Колонка", 10740, 8110, "water", 0], ["Колонка", 9515, 8855, "water", 0],
+  ["Колонка", 7565, 5140, "water", 0], ["Колонка", 5865, 4735, "water", 0],
+  ["Колонка", 6065, 7735, "water", 0], ["Колонка", 7135, 7695, "water", 0],
+  ["Колонка", 5335, 8595, "water", 0], ["Колонка", 3805, 8915, "water", 0],
+  ["Колонка", 3065, 7965, "water", 0], ["Колонка", 2715, 5305, "water", 0],
+  ["Колонка", 2165, 3365, "water", 0], ["Колонка", 3665, 2465, "water", 0],
+  ["Колонка", 4735, 2485, "water", 0], ["Колонка", 6585, 2515, "water", 0],
+  ["Колонка", 10345, 2215, "water", 0], ["Колонка", 12915, 10115, "water", 0],
+  ["Колонка", 12965, 8135, "water", 0], ["Колонка", 13905, 13235, "water", 0],
+  ["Колонка", 11435, 14435, "water", 0], ["Колонка", 8435, 12705, "water", 0],
+  ["Колонка", 3465, 12965, "water", 0], ["Колонка", 5965, 10305, "water", 0],
+  ["Колонка", 11165, 12235, "water", 0], ["Колонка", 8605, 11835, "water", 0],
+
+  ["Полиция", 12025, 3525, "police", 4], ["Полиция", 10365, 2165, "police", 5],
+  ["Полиция", 6515, 2455, "police", 5], ["Полиция", 12945, 10055, "police", 5],
+  ["Полиция", 13885, 13265, "police", 4], ["Полиция", 11485, 14475, "police", 4],
+  ["Полиция", 8395, 12745, "police", 4], ["Полиция", 3425, 12995, "police", 4],
+  ["Полиция", 3845, 8945, "police", 4], ["Полиция", 2745, 5255, "police", 5],
+  ["Полиция", 9545, 8795, "police", 4], ["Полиция", 11195, 12275, "police", 4],
+
+  ["Больница", 10285, 2235, "med", 3], ["Больница", 6615, 2535, "med", 3],
+  ["Больница", 12885, 10145, "med", 3], ["Больница", 11415, 14415, "med", 3],
+  ["Больница", 8465, 12685, "med", 3], ["Медпункт", 2695, 5335, "med", 3],
+  ["Медпункт", 6115, 7715, "med", 3], ["Медпункт", 9495, 8875, "med", 3],
+  ["Медпункт", 13945, 13215, "med", 3], ["Медпункт", 3785, 8885, "med", 3]
+];
+let cal = JSON.parse(localStorage.getItem('dayz_cal_v3') || '{"x":0,"y":0}');
+let customPois = JSON.parse(localStorage.getItem('dayz_custom_v3') || '[]');
+
+function gameToPx(gx, gy) {
+  const playW = 4000 - BORDER * 2;
+  return {
+    x: Math.round(BORDER + (gx / REAL_METERS) * playW + cal.x),
+    y: Math.round(BORDER + ((REAL_METERS - gy) / REAL_METERS) * playW + cal.y)
+  };
+}
+
+function getAllPois() {
+  const base = rawDb.map(item => {
+    const pt = gameToPx(item.at(1), item.at(2));
+    return { name: item.at(0), x: pt.x, y: pt.y, cat: item.at(3), risk: item.at(4) };
+  });
+  return base.concat(customPois);
+}
+
+const canvas = document.getElementById('mapCanvas'), ctx = canvas.getContext('2d'), dpr = window.devicePixelRatio || 1;
+const img = new Image(); img.src = MAP_FILE;
+let scale = 0.2, offsetX = 0, offsetY = 0;
+let layers = { city: true, mil: true, camp: true, water: true, police: true, med: true };
+let waypoints = [], isPinMode = false;
+
+function updateCalLabel() { document.getElementById('cal-val').textContent = cal.x + ', ' + cal.y; }
+updateCalLabel();
+
+function shiftCal(dx, dy) { cal.x += dx; cal.y += dy; localStorage.setItem('dayz_cal_v3', JSON.stringify(cal)); updateCalLabel(); draw(); }
+function resetCal() { cal = { x: 0, y: 0 }; localStorage.setItem('dayz_cal_v3', JSON.stringify(cal)); updateCalLabel(); draw(); }
+function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); }
+
+function toggleLayer(cat) {
+  layers[cat] = !layers[cat];
+  document.getElementById('l-' + cat).classList.toggle('active', layers[cat]);
+  document.getElementById('st-' + cat).textContent = layers[cat] ? 'ВКЛ' : 'ВЫКЛ';
+  draw();
+}
+
+function togglePinMode() {
+  isPinMode = !isPinMode;
+  const btn = document.getElementById('pin-mode-btn');
+  btn.textContent = isPinMode ? 'Установка меток: ВКЛ' : 'Установка меток: ВЫКЛ';
+  btn.classList.toggle('btn-accent', isPinMode);
+  if (isPinMode) toggleDrawer();
+}
+
+function resize() { canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr; if (img.complete && img.width) resetView(); }
+window.addEventListener('resize', resize); img.onload = resize;
+function resetView() { scale = Math.min(canvas.width / img.width, canvas.height / img.height); offsetX = (canvas.width - img.width * scale) / 2; offsetY = (canvas.height - img.height * scale) / 2; draw(); }
+
+function drawPinMarker(x, y, bg, symbol, rBase) {
+  const r = (rBase * dpr) / scale;
+  const cy = y - r * 1.45;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.bezierCurveTo(x - r * 0.9, y - r * 0.6, x - r, cy - r * 0.2, x - r, cy);
+  ctx.arc(x, cy, r, Math.PI, 0, false);
+  ctx.bezierCurveTo(x + r, cy - r * 0.2, x + r * 0.9, y - r * 0.6, x, y);
+  ctx.closePath();
+  ctx.fillStyle = bg; ctx.fill();
+  ctx.strokeStyle = '#0f1110'; ctx.lineWidth = (1.5 * dpr) / scale; ctx.stroke();
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '800 ' + Math.round((rBase * 1.1 * dpr) / scale) + 'px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(symbol, x, cy);
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+}
+
+function drawTag(x, y, text) {
+  const padX = (5 * dpr) / scale, h = (15 * dpr) / scale;
+  ctx.font = '700 ' + Math.round((10 * dpr) / scale) + 'px sans-serif';
+  const w = ctx.measureText(text).width + padX * 2;
+  const rx = x + (10 * dpr) / scale, ry = y - h * 1.3;
+  ctx.fillStyle = 'rgba(24, 28, 26, 0.94)';
+  ctx.beginPath(); ctx.roundRect(rx, ry, w, h, (4 * dpr) / scale); ctx.fill();
+  ctx.strokeStyle = '#a83232'; ctx.lineWidth = (1.2 * dpr) / scale; ctx.stroke();
+  ctx.fillStyle = '#e2e6e3';
+  ctx.fillText(text, rx + padX, ry + h * 0.72);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); if (!img.width) return;
+  ctx.save(); ctx.translate(offsetX, offsetY); ctx.scale(scale, scale); ctx.drawImage(img, 0, 0);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  if (waypoints.length > 1) {
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      const a = waypoints.at(i), b = waypoints.at(i + 1);
+      const segRisk = getSegmentRisk(a, b);
+      const col = segRisk >= 7.5 ? '#c93b3b' : (segRisk >= 4.5 ? '#d4a359' : '#4ade80');
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = 'rgba(15,17,16,0.85)'; ctx.lineWidth = (4.6 * dpr) / scale; ctx.stroke();
+      ctx.strokeStyle = col; ctx.lineWidth = (2.5 * dpr) / scale; ctx.stroke();
+    }
   }
-  refreshLanguage();
-  window.addEventListener('message',e=>{if(e.data&&e.data.type==='ct-language-change')refreshLanguage()});
-  window.addEventListener('storage',e=>{if(e.key==='ct_language')refreshLanguage()});
-  window.addEventListener('ct-language-change',refreshLanguage);
-})();
+
+  const fontSize = Math.max(9.5, Math.min(13, 9.5 + scale * 3.5)) * dpr;
+  ctx.font = '600 ' + Math.round(fontSize / scale) + 'px sans-serif';
+
+  getAllPois().forEach(p => {
+    if (!layers[p.cat]) return;
+    if (p.cat === 'city') {
+      ctx.beginPath(); ctx.arc(p.x, p.y, (3.2 * dpr) / scale, 0, Math.PI * 2);
+      ctx.fillStyle = p.risk >= 8 ? '#c93b3b' : '#d4a359'; ctx.fill();
+      ctx.strokeStyle = '#0f1110'; ctx.lineWidth = (1.4 * dpr) / scale; ctx.stroke();
+      if (p.name) {
+        const tx = p.x + (5.5 * dpr) / scale, ty = p.y + (3.5 * dpr) / scale;
+        ctx.strokeStyle = 'rgba(15,17,16,0.92)'; ctx.lineWidth = (2.8 * dpr) / scale; ctx.strokeText(p.name, tx, ty);
+        ctx.fillStyle = p.risk >= 8 ? '#ff8a8a' : '#e2e6e3'; ctx.fillText(p.name, tx, ty);
+      }
+    } else if (p.cat === 'mil') {
+      drawPinMarker(p.x, p.y, '#a83232', '★', 8.5);
+      if (p.name && scale > 0.22) {
+        const tx = p.x + (9 * dpr) / scale, ty = p.y - (4 * dpr) / scale;
+        ctx.strokeStyle = 'rgba(15,17,16,0.92)'; ctx.lineWidth = (2.8 * dpr) / scale; ctx.strokeText(p.name, tx, ty);
+        ctx.fillStyle = '#ff8a8a'; ctx.fillText(p.name, tx, ty);
+      }
+    } else if (p.cat === 'camp' && scale > 0.22) {
+      drawPinMarker(p.x, p.y, '#7c5328', '▲', 8);
+    } else if (p.cat === 'water' && scale > 0.26) {
+      drawPinMarker(p.x, p.y, '#1d6f96', '💧', 7.5);
+    } else if (p.cat === 'police' && scale > 0.26) {
+      drawPinMarker(p.x, p.y, '#b58428', 'P', 7.5);
+    } else if (p.cat === 'med' && scale > 0.26) {
+      drawPinMarker(p.x, p.y, '#2e7d32', '+', 7.5);
+    }
+  });
+
+  let accPx = 0;
+  const mPerPx = REAL_METERS / (img.width - BORDER * 2);
+  waypoints.forEach((pt, idx) => {
+    if (idx > 0) accPx += Math.hypot(pt.x - waypoints.at(idx - 1).x, pt.y - waypoints.at(idx - 1).y);
+    const isStart = idx === 0, isEnd = idx === waypoints.length - 1 && waypoints.length > 1;
+    const bg = isStart ? '#2e7d32' : (isEnd ? '#a83232' : '#d4a359');
+    const lbl = isStart ? 'А' : (isEnd ? 'Б' : String(idx));
+    drawPinMarker(pt.x, pt.y, bg, lbl, 9.5);
+    if (idx > 0) {
+      const km = ((accPx * mPerPx) / 1000).toFixed(1);
+      const min = Math.round(((accPx * mPerPx) / 1000) / 14.5 * 60);
+      drawTag(pt.x, pt.y, km + ' км • ' + min + ' мин');
+    }
+  });
+
+  ctx.restore();
+}
+function handleAction(clientX, clientY) {
+  const x = Math.round((clientX * dpr - offsetX) / scale), y = Math.round((clientY * dpr - offsetY) / scale);
+  if (x < 0 || x > img.width || y < 0 || y > img.height) return;
+  if (isPinMode) {
+    const cat = document.getElementById('pin-type').value;
+    const name = document.getElementById('pin-name').value.trim();
+    const riskMap = { water: 0, police: 4, med: 3, mil: 8, camp: 4, city: 4 };
+    customPois.push({ name: name, x: x, y: y, cat: cat, risk: riskMap[cat] });
+    document.getElementById('pin-name').value = '';
+    localStorage.setItem('dayz_custom_v3', JSON.stringify(customPois));
+    draw();
+  } else {
+    waypoints.push({ x: x, y: y });
+    updateStats(); draw();
+  }
+}
+
+let mouseDown = false, mouseMoved = false, mStart = { x: 0, y: 0 };
+canvas.addEventListener('mousedown', e => { if (e.button === 0) { mouseDown = true; mouseMoved = false; mStart = { x: e.clientX, y: e.clientY }; } });
+canvas.addEventListener('mousemove', e => {
+  if (!mouseDown) return;
+  if (Math.hypot(e.clientX - mStart.x, e.clientY - mStart.y) > 5) mouseMoved = true;
+  offsetX += e.movementX * dpr; offsetY += e.movementY * dpr; draw();
+});
+canvas.addEventListener('mouseup', e => { if (mouseDown && !mouseMoved) handleAction(e.clientX, e.clientY); mouseDown = false; });
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.18 : 0.85;
+  const cx = e.clientX * dpr, cy = e.clientY * dpr;
+  const ns = Math.min(Math.max(scale * factor, 0.1), 8);
+  offsetX = cx - (cx - offsetX) * (ns / scale); offsetY = cy - (cy - offsetY) * (ns / scale); scale = ns; draw();
+}, { passive: false });
+
+let lastT = [], touchMoved = false, tap0 = null;
+canvas.addEventListener('touchstart', e => { lastT = Array.from(e.touches); if (e.touches.length === 1) { touchMoved = false; tap0 = { x: lastT.at(0).clientX, y: lastT.at(0).clientY }; } });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault(); const t = Array.from(e.touches);
+  if (t.length === 1 && lastT.length === 1) { const a = t.at(0), b = lastT.at(0); if (Math.hypot(a.clientX - tap0.x, a.clientY - tap0.y) > 8) touchMoved = true; offsetX += (a.clientX - b.clientX) * dpr; offsetY += (a.clientY - b.clientY) * dpr; }
+  else if (t.length === 2 && lastT.length === 2) { touchMoved = true; const t0 = t.at(0), t1 = t.at(1), l0 = lastT.at(0), l1 = lastT.at(1); const d1 = Math.hypot(l0.clientX - l1.clientX, l0.clientY - l1.clientY), d2 = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY); const cx = ((t0.clientX + t1.clientX) / 2) * dpr, cy = ((t0.clientY + t1.clientY) / 2) * dpr; const ns = Math.min(Math.max(scale * (d2 / d1), 0.1), 8); offsetX = cx - (cx - offsetX) * (ns / scale); offsetY = cy - (cy - offsetY) * (ns / scale); scale = ns; }
+  lastT = t; draw();
+});
+canvas.addEventListener('touchend', e => { if (!touchMoved && tap0 && e.touches.length === 0) { handleAction(tap0.x, tap0.y); tap0 = null; } });
+
+function undoPoint() { if (waypoints.length > 0) { waypoints.pop(); updateStats(); draw(); } }
+function clearRoute() { waypoints = []; updateStats(); draw(); }
+
+function getSegmentRisk(a, b) {
+  let maxR = 1; const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+  getAllPois().forEach(p => { if (p.risk > 0) { const d = Math.min(Math.hypot(p.x - a.x, p.y - a.y), Math.hypot(p.x - b.x, p.y - b.y), Math.hypot(p.x - mx, p.y - my)); if (d < 220 && p.risk > maxR) maxR = p.risk; } });
+  return maxR;
+}
+
+function getStatusName(val, isFood) { if (val > 50) return isFood ? '⚪ белое яблоко' : '⚪ белая вода'; if (val > 15) return isFood ? '🟡 жёлтое яблоко' : '🟡 жёлтая вода'; return isFood ? '🔴 красное яблоко' : '🔴 красная вода'; }
+
+function updateStats() {
+  const box = document.getElementById('info-box');
+  if (waypoints.length === 0) { box.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:3px 0;">Кликните по карте для старта (А), затем по поворотам маршрута.</div>'; return; }
+  if (waypoints.length === 1) { box.innerHTML = '<div style="color:#d4a359;text-align:center;padding:3px 0;">Старт А поставлен. Кликайте дальше по поворотам дороги.</div>'; return; }
+
+  let totalPx = 0, maxRisk = 1, dangers = new Set(), wellsCount = 0;
+  const all = getAllPois();
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const a = waypoints.at(i), b = waypoints.at(i + 1);
+    totalPx += Math.hypot(b.x - a.x, b.y - a.y);
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    all.forEach(p => {
+      const d = Math.min(Math.hypot(p.x - a.x, p.y - a.y), Math.hypot(p.x - b.x, p.y - b.y), Math.hypot(p.x - mx, p.y - my));
+      if (p.risk >= 7 && d < 220) { if (p.name && p.cat !== 'police') dangers.add(p.name); if (p.risk > maxRisk) maxRisk = p.risk; }
+      if (p.risk >= 4 && p.risk < 7 && d < 200 && p.risk > maxRisk) maxRisk = p.risk;
+      if (p.cat === 'water' && d < 140) wellsCount++;
+    });
+  }
+
+  const meters = Math.round(totalPx * (REAL_METERS / (img.width - BORDER * 2)));
+  const km = (meters / 1000).toFixed(2);
+  const jogMin = Math.round((meters / 1000) / 14.5 * 60);
+  const sprintMin = Math.round((meters / 1000) / 19.5 * 60);
+
+  const food = Number(document.getElementById('food').value), water = Number(document.getElementById('water').value);
+  const remF = food - Math.round(meters / 220), remW = water - Math.round(meters / 150);
+
+  const borderCol = maxRisk >= 8 ? '#c93b3b' : (maxRisk >= 5 ? '#d4a359' : '#4ade80');
+  const riskText = maxRisk >= 8 ? '<span style="color:#ff8a8a">Высокий</span>' : (maxRisk >= 5 ? '<span style="color:#d4a359">Умеренный</span>' : '<span style="color:#7ce09b">Безопасно</span>');
+  const aliveText = (remF > 0 && remW > 0) ? '<span style="color:#7ce09b">Дойдёте</span>' : '<span style="color:#ff8a8a">Не хватит припасов!</span>';
+
+  let extra = '';
+  if (dangers.size > 0) extra += '<div style="color:#ff8a8a;margin-top:3px;">⚠️ Опасные зоны: ' + Array.from(dangers).join(', ') + '</div>';
+  if (wellsCount > 0) extra += '<div style="color:#7dd3fc;margin-top:2px;">💧 Колонок на пути: ' + wellsCount + '</div>';
+
+  box.innerHTML = '<div class="stat-card" style="border-left-color:' + borderCol + '">' +
+    '<div class="stat-grid">' +
+      '<div class="stat-item"><span class="stat-val">' + km + ' км</span><span class="stat-sub">Дистанция</span></div>' +
+      '<div class="stat-item"><span class="stat-val">~' + jogMin + ' мин</span><span class="stat-sub">Трусцой (спринт ' + sprintMin + 'м)</span></div>' +
+      '<div class="stat-item"><span class="stat-val">' + riskText + '</span><span class="stat-sub">Риск ПВП</span></div>' +
+    '</div>' +
+    '<div><b>Финиш:</b> ' + aliveText + ' (' + getStatusName(remF, true) + ', ' + getStatusName(remW, false) + ')</div>' +
+    extra +
+  '</div>';
+}
 </script>
-</body>
+\n<script>\nfunction searchPoi(){const q=(document.getElementById('poi-search').value||'').trim().toLocaleLowerCase();if(!q)return;const found=getAllPois().find(p=>p.name.toLocaleLowerCase()===q)||getAllPois().find(p=>p.name.toLocaleLowerCase().includes(q));if(!found){document.getElementById('info-box').textContent='Объект не найден. Попробуй другое название.';return;}const cx=canvas.width/2,cy=canvas.height/2;offsetX=cx-found.x*scale;offsetY=cy-found.y*scale;waypoints.push({x:found.x,y:found.y});updateStats();draw();document.getElementById('poi-search').blur();}\nfunction populatePoiSearch(){const dl=document.getElementById('poi-list');if(dl)dl.innerHTML=getAllPois().map(p=>'<option value="'+String(p.name).replace(/"/g,'&quot;')+'">').join('');}\nwindow.addEventListener('load',populatePoiSearch);\nwindow.addEventListener('message',e=>{if(e.data==='CT_MAP_VISIBLE'){resize();}if(e.data&&e.data.type==='ct-language-change'){localStorage.setItem('ct_language',e.data.lang);if(window.ctApplyLanguage)window.ctApplyLanguage(e.data.lang);}});\n</script>\n<script src="language.js"></script>\n</body>
 </html>
