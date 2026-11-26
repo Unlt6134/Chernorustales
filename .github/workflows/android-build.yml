@@ -27,6 +27,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # Avoid the obsolete "tools" package that caused sdkmanager to fail.
+          packages: "platform-tools,platforms;android-35,build-tools;35.0.0"
 
       - name: Export Godot project
         id: export
