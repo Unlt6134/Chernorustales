@@ -1,0 +1,31 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "godot_game/**"
+      - ".github/workflows/android-build.yml"
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Export Android APK with Godot
+        uses: firebelley/godot-export@v6
+        with:
+          godot-version: 4.4.1
+          export-packages: android
+          project-path: godot_game
+          export_path: build/
+          archive: true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChernarusTales-Android
+          path: godot_game/build/
+          if-no-files-found: error
