@@ -1,0 +1,47 @@
+name: Build Chernarus Tales Android test APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "godot_game/**"
+      - ".github/workflows/android-build.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Export Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Export Godot project
+        id: export
+        uses: firebelley/godot-export@v8.0.0
+        with:
+          godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          relative_project_path: godot_game
+          presets_to_export: Android
+          use_preset_export_path: true
+          archive_output: true
+
+      - name: Upload APK archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChernarusTales-Android-test
+          path: ${{ steps.export.outputs.archive_directory }}/*
+          if-no-files-found: error
