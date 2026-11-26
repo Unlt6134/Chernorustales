@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Чернорусские истории",
+    "slug": "chernorustales",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "android": {
+      "package": "com.chernorustales.story",
+      "versionCode": 1
+    },
+    "extra": {
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+      }
+    }
+  }
+}
