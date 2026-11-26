@@ -25,11 +25,16 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
+      - name: Set up Android SDK command line
         uses: android-actions/setup-android@v3
         with:
-          # Avoid the obsolete "tools" package that caused sdkmanager to fail.
-          packages: "platform-tools,platforms;android-35,build-tools;35.0.0"
+          packages: ""
+
+      - name: Install Android export components
+        run: |
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-35"
+          sdkmanager "build-tools;35.0.0"
 
       - name: Export Godot project
         id: export
